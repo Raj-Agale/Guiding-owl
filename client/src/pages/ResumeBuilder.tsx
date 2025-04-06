@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import { 
   Download, 
   FileText, 
@@ -19,12 +21,24 @@ import {
   FileStack,
   Save,
   Share2,
-  Link2
+  Link2,
+  Search,
+  Check,
+  Building,
+  Lightbulb,
+  Info,
+  Star,
+  BookOpen,
+  MessageSquare,
+  PenTool
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import ResumeForm from "@/components/resume/ResumeForm";
 import ResumePreview from "@/components/resume/ResumePreview";
 import ResumeTemplates from "@/components/resume/ResumeTemplates";
+import { companyPreferences, getCompanyPreferences, resumeTips } from "@/data/companyPreferences";
+import { sampleResumes } from "@/data/sampleResumes";
+import { generateResumeContent } from "@/utils/generateResumeContent";
 
 export type ResumeData = {
   personalInfo: {
@@ -103,7 +117,12 @@ export type ResumeData = {
   }>;
 };
 
-type ResumeType = 'college' | 'job' | 'creative' | 'tech';
+type ResumeType = 'college' | 'job' | 'creative' | 'tech' | 'company';
+
+type ResumeIntent = {
+  type: ResumeType;
+  target?: string;
+};
 
 const resumeTypeInfo = {
   college: {
@@ -129,27 +148,36 @@ const resumeTypeInfo = {
     label: 'Tech Resume',
     description: 'For coders/projects',
     color: 'bg-amber-500'
+  },
+  company: {
+    icon: <Building className="h-5 w-5" />,
+    label: 'Company-Specific',
+    description: 'Targeted for a specific company',
+    color: 'bg-indigo-500'
   }
 };
 
 const ResumeBuilder = () => {
   const [activeTab, setActiveTab] = useState("create");
   const [selectedTemplate, setSelectedTemplate] = useState("modern");
-  const [resumeType, setResumeType] = useState<ResumeType>('college');
+  const [resumeIntent, setResumeIntent] = useState<ResumeIntent>({
+    type: 'job',
+    target: ''
+  });
+  const [intentInput, setIntentInput] = useState("");
   const [isAiGenerating, setIsAiGenerating] = useState(false);
+  const [targetCompany, setTargetCompany] = useState<string>("");
+  const [companyPreference, setCompanyPreference] = useState<any>(null);
+  const [showSampleResumes, setShowSampleResumes] = useState(false);
+  const [activeSampleResume, setActiveSampleResume] = useState<string | null>(null);
   const [resumeData, setResumeData] = useState<ResumeData>({
     personalInfo: {
-      name: "Aarav Singh",
-      title: "Computer Science Student",
-      email: "aarav.singh@example.com",
-      phone: "+91 98765 43210",
-      location: "Bangalore, India",
-      summary: "Motivated Computer Science student with a passion for AI and machine learning. Seeking opportunities to apply technical skills in a practical environment.",
-      goal: "Get into MIT (CS)",
-      academicFocus: "SAT + AI Projects",
-      testScores: {
-        sat: "1520/1600"
-      }
+      name: "",
+      title: "",
+      email: "",
+      phone: "",
+      location: "",
+      summary: "Professional summary goes here. Describe your experience, skills, and career goals."
     },
     education: [],
     experience: [],
@@ -159,6 +187,73 @@ const ResumeBuilder = () => {
     extracurriculars: [],
     achievements: []
   });
+
+  // Parse intent input to determine resume type and target
+  const parseIntent = (input: string) => {
+    // Reset first
+    let newIntent: ResumeIntent = {
+      type: 'job',
+      target: ''
+    };
+
+    const inputLower = input.toLowerCase();
+    
+    // Check for educational institutions
+    if (inputLower.includes('college') || 
+        inputLower.includes('university') || 
+        inputLower.includes('admission') || 
+        inputLower.includes('iit') || 
+        inputLower.includes('mit')) {
+      newIntent.type = 'college';
+      
+      // Extract target institution if present
+      const eduKeywords = ['iit', 'mit', 'harvard', 'stanford', 'university', 'college', 'school'];
+      for (const keyword of eduKeywords) {
+        if (inputLower.includes(keyword)) {
+          const regex = new RegExp(`(\\w+\\s+)?${keyword}(\\s+\\w+)?`, 'i');
+          const match = input.match(regex);
+          if (match) {
+            newIntent.target = match[0].trim();
+            break;
+          }
+        }
+      }
+    } 
+    // Check for creative industries
+    else if (inputLower.includes('design') || 
+             inputLower.includes('art') || 
+             inputLower.includes('photo') || 
+             inputLower.includes('creative')) {
+      newIntent.type = 'creative';
+    } 
+    // Check for tech-specific
+    else if (inputLower.includes('software') || 
+             inputLower.includes('developer') || 
+             inputLower.includes('coding') || 
+             inputLower.includes('engineer') || 
+             inputLower.includes('programmer')) {
+      newIntent.type = 'tech';
+    }
+    // Check for specific company
+    else {
+      // Check against our company database
+      const normalizedInput = inputLower.replace(/\s+/g, '');
+      
+      for (const key in companyPreferences) {
+        const companyName = companyPreferences[key].name.toLowerCase();
+        if (normalizedInput.includes(key) || 
+            normalizedInput.includes(companyName.toLowerCase().replace(/\s+/g, ''))) {
+          newIntent.type = 'company';
+          newIntent.target = companyPreferences[key].name;
+          setTargetCompany(companyPreferences[key].name);
+          setCompanyPreference(companyPreferences[key]);
+          break;
+        }
+      }
+    }
+    
+    setResumeIntent(newIntent);
+  };
 
   const handleTemplateSelect = (templateId: string) => {
     setSelectedTemplate(templateId);
@@ -180,128 +275,246 @@ const ResumeBuilder = () => {
   };
 
   const handleResumeTypeSelect = (type: ResumeType) => {
-    setResumeType(type);
+    if (type === 'company') {
+      // Keep the company info if switching to company type
+      setResumeIntent({
+        type: 'company',
+        target: resumeIntent.type === 'company' ? resumeIntent.target : ''
+      });
+    } else {
+      // Reset company info when switching to other types
+      setResumeIntent({
+        type: type,
+        target: ''
+      });
+      setTargetCompany("");
+      setCompanyPreference(null);
+    }
   };
 
-  const handleGenerateWithAI = () => {
+  const handleCompanySearch = () => {
+    if (intentInput.trim() === '') return;
+    
+    // Try to find matching company
+    const companyInfo = getCompanyPreferences(intentInput);
+    
+    if (companyInfo) {
+      setTargetCompany(companyInfo.name);
+      setCompanyPreference(companyInfo);
+      setResumeIntent({
+        type: 'company',
+        target: companyInfo.name
+      });
+    } else {
+      // No specific company match, use general parsing
+      parseIntent(intentInput);
+    }
+  };
+
+  const handleIntentSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleCompanySearch();
+  };
+
+  const handleIntentKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleCompanySearch();
+    }
+  };
+
+  const handleGenerateWithAI = async () => {
     setIsAiGenerating(true);
-    // Simulate AI processing
-    setTimeout(() => {
-      // In a real application, this would call OpenAI to enhance the resume
-      const enhancedResume = {
+    
+    try {
+      // Call our utility to generate AI-enhanced content
+      const enhancedContent = await generateResumeContent({
+        resumeData,
+        companyPreference: resumeIntent.type === 'company' ? companyPreference : undefined,
+        targetType: resumeIntent.type === 'company' ? undefined : resumeIntent.type as any
+      });
+      
+      // Update resume data with AI-generated content
+      setResumeData({
         ...resumeData,
         personalInfo: {
           ...resumeData.personalInfo,
-          summary: "Driven Computer Science student with demonstrated proficiency in AI and machine learning. Experienced in developing Python-based applications integrating custom NLP modules and seeking to leverage technical expertise to drive innovation in computational problem-solving."
+          summary: enhancedContent.personalInfo.summary
         },
-        skills: [
-          { id: "1", name: "Python Programming", level: 4 },
-          { id: "2", name: "Machine Learning", level: 3 },
-          { id: "3", name: "Data Structures", level: 4 },
-          { id: "4", name: "Natural Language Processing", level: 3 },
-          { id: "5", name: "Problem Solving", level: 5 }
-        ],
-        projects: [
-          { 
-            id: "1", 
-            name: "Voice Assistant with NLP", 
-            description: "Developed a Python-based voice assistant, integrating custom NLP modules for task automation and contextual understanding of user commands.", 
-            url: "github.com/aarav/voice-assistant", 
-            highlights: ["Implemented speech recognition with 95% accuracy", "Designed modular architecture for extensibility", "Integrated with multiple APIs for enhanced functionality"]
+        skills: enhancedContent.skills.length > 0 ? enhancedContent.skills : resumeData.skills,
+        projects: enhancedContent.projects.length > 0 ? enhancedContent.projects : resumeData.projects,
+        experience: resumeData.experience.map((exp, index) => {
+          if (index < enhancedContent.experience.length) {
+            return {
+              ...exp,
+              description: enhancedContent.experience[index].description,
+              highlights: enhancedContent.experience[index].highlights
+            };
           }
-        ]
-      };
-      setResumeData(enhancedResume);
-      setIsAiGenerating(false);
+          return exp;
+        })
+      });
+      
+      // Switch to preview tab
       setActiveTab("preview");
-    }, 3000);
+    } catch (error) {
+      console.error("Error generating resume content:", error);
+    } finally {
+      setIsAiGenerating(false);
+    }
+  };
+
+  // Get relevant tips based on intent
+  const getTips = () => {
+    if (resumeIntent.type === 'company' && companyPreference) {
+      return companyPreference.tips;
+    } else {
+      return resumeTips[resumeIntent.type as keyof typeof resumeTips] || resumeTips.job;
+    }
+  };
+
+  // Get relevant sample resumes
+  const getSampleResumes = () => {
+    if (resumeIntent.type === 'company' && companyPreference) {
+      return sampleResumes.filter(resume => 
+        resume.company.toLowerCase() === companyPreference.name.toLowerCase());
+    } else {
+      // Filter by type - this is placeholder logic, would need actual type data in sampleResumes
+      return sampleResumes.slice(0, 3);
+    }
+  };
+
+  // Toggle the sample resume display
+  const toggleSampleResume = (id: string) => {
+    if (activeSampleResume === id) {
+      setActiveSampleResume(null);
+    } else {
+      setActiveSampleResume(id);
+    }
   };
 
   return (
-    <main className="min-h-screen py-10 bg-gradient-to-b from-gray-50 to-[#f8f5f0]">
+    <main className="min-h-screen py-8 bg-gradient-to-b from-gray-50 to-[#f8f5f0]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section 1: User Info Summary (Top Banner) */}
-        <div className="bg-white rounded-xl shadow-sm p-4 mb-8 flex flex-col md:flex-row justify-between items-center">
-          <div className="flex items-center mb-4 md:mb-0">
-            <div className="bg-primary-100 rounded-full p-3 mr-4">
-              <Brain className="h-7 w-7 text-primary-600" />
+        {/* Page Header */}
+        <div className="flex flex-col items-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-purple-700">
+            OwlPath Resume Builder
+          </h1>
+          <p className="mt-3 text-gray-600 text-center max-w-2xl">
+            Create targeted, optimized resumes for specific companies or career paths with AI assistance
+          </p>
+        </div>
+
+        {/* Resume Intent Selector (Search box for company or type) */}
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+          <h2 className="text-xl font-bold mb-4 flex items-center text-gray-900">
+            <Search className="h-5 w-5 text-primary-600 mr-2" />
+            Resume Intent
+          </h2>
+          
+          <form onSubmit={handleIntentSubmit}>
+            <div className="flex flex-col md:flex-row gap-3">
+              <div className="relative flex-grow">
+                <Input
+                  type="text"
+                  placeholder="Enter company name or goal (e.g., 'Google SWE', 'McKinsey', or 'MIT Admission')"
+                  value={intentInput}
+                  onChange={(e) => setIntentInput(e.target.value)}
+                  onKeyDown={handleIntentKeyDown}
+                  className="pr-10 h-12 text-lg"
+                />
+                {intentInput && (
+                  <button 
+                    type="button"
+                    onClick={() => setIntentInput('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+              <Button 
+                type="submit"
+                size="lg" 
+                className="bg-primary-600 hover:bg-primary-700 text-white min-w-[120px]"
+              >
+                Set Target
+              </Button>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">{resumeData.personalInfo.name || "User"}</h2>
-              <div className="flex flex-wrap items-center text-sm text-gray-600 mt-1">
-                <span className="flex items-center">
-                  <span className="font-medium">Goal:</span>
-                  <span className="ml-1">{resumeData.personalInfo.goal || "Not set"}</span>
-                </span>
-                <span className="mx-2 text-gray-400">|</span>
-                <span className="flex items-center">
-                  <span className="font-medium">Focus:</span>
-                  <span className="ml-1">{resumeData.personalInfo.academicFocus || "Not set"}</span>
-                </span>
+          </form>
+          
+          {/* Current intent display */}
+          {(resumeIntent.type || resumeIntent.target) && (
+            <div className="mt-4 flex items-center">
+              <div className="bg-primary-50 text-primary-700 px-3 py-2 rounded-lg flex items-center">
+                <span className="mr-2">Current target:</span>
+                
+                {resumeIntent.type === 'company' ? (
+                  <Badge className="bg-indigo-100 text-indigo-800 border-indigo-200 mr-2">
+                    <Building className="h-3.5 w-3.5 mr-1" />
+                    Company
+                  </Badge>
+                ) : (
+                  <Badge className={`mr-2 ${
+                    resumeIntent.type === 'college' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                    resumeIntent.type === 'creative' ? 'bg-purple-100 text-purple-800 border-purple-200' :
+                    resumeIntent.type === 'tech' ? 'bg-amber-100 text-amber-800 border-amber-200' :
+                    'bg-emerald-100 text-emerald-800 border-emerald-200'
+                  }`}>
+                    {resumeTypeInfo[resumeIntent.type].icon}
+                    <span className="ml-1">{resumeTypeInfo[resumeIntent.type].label}</span>
+                  </Badge>
+                )}
+                
+                {resumeIntent.target && (
+                  <span className="font-medium">{resumeIntent.target}</span>
+                )}
               </div>
             </div>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleSaveResume}>
-              <Save className="h-4 w-4 mr-1.5" />
-              Save
-            </Button>
-            <Button variant="outline" size="sm" onClick={handlePrint}>
-              <Printer className="h-4 w-4 mr-1.5" />
-              Print
-            </Button>
-            <Button className="bg-primary-600 hover:bg-primary-700" size="sm" onClick={handleDownloadPDF}>
-              <Download className="h-4 w-4 mr-1.5" />
-              Download PDF
-            </Button>
+          )}
+          
+          {/* Type buttons - default options */}
+          <div className="mt-6">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Or select a resume type:</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+              {(Object.keys(resumeTypeInfo) as ResumeType[]).map((type) => (
+                <div 
+                  key={type}
+                  className={`flex flex-col items-center p-3 rounded-lg border cursor-pointer transition-all hover:border-primary-300 hover:shadow-sm ${
+                    resumeIntent.type === type 
+                      ? 'border-primary-500 bg-primary-50' 
+                      : 'border-gray-200'
+                  }`}
+                  onClick={() => handleResumeTypeSelect(type)}
+                >
+                  <div className={`rounded-full p-1.5 ${resumeTypeInfo[type].color} text-white mb-1.5`}>
+                    {resumeTypeInfo[type].icon}
+                  </div>
+                  <span className="font-medium text-xs">{resumeTypeInfo[type].label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Main content area - split into two columns on desktop */}
+        {/* Main content area - split into column layout */}
         <div className="flex flex-col lg:flex-row gap-8">
-          <div className="lg:w-2/3 order-2 lg:order-1">
-            {/* Section 2: Resume Type Selector */}
-            <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-              <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-900">
-                <FileStack className="h-5 w-5 text-primary-600 mr-2" />
-                Resume Type
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {(Object.keys(resumeTypeInfo) as ResumeType[]).map((type) => (
-                  <div 
-                    key={type}
-                    className={`flex flex-col items-center p-4 rounded-lg border-2 cursor-pointer transition-all hover:border-primary-300 hover:shadow-md ${
-                      resumeType === type 
-                        ? 'border-primary-500 bg-primary-50' 
-                        : 'border-gray-200'
-                    }`}
-                    onClick={() => handleResumeTypeSelect(type)}
-                  >
-                    <div className={`rounded-full p-2 ${resumeTypeInfo[type].color} text-white mb-2`}>
-                      {resumeTypeInfo[type].icon}
-                    </div>
-                    <span className="font-medium text-sm">{resumeTypeInfo[type].label}</span>
-                    <span className="text-xs text-gray-500 text-center mt-1">{resumeTypeInfo[type].description}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Section 3: Editable Resume Form */}
+          {/* Left column - Editor and AI Generator */}
+          <div className="lg:w-3/5">
+            {/* Resume Editor */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
               <div className="border-b border-gray-100 p-4 flex justify-between items-center">
                 <h3 className="text-lg font-semibold flex items-center">
                   <Pencil className="h-5 w-5 text-primary-600 mr-2" />
                   Resume Content
                 </h3>
-                <div>
+                <div className="flex gap-2">
                   <Button 
                     variant="outline" 
                     size="sm"
                     onClick={() => setActiveTab("templates")}
-                    className="mr-2"
                   >
-                    Change Template
+                    Templates
                   </Button>
                   <Button 
                     size="sm"
@@ -321,8 +534,8 @@ const ResumeBuilder = () => {
               </div>
             </div>
 
-            {/* Section 4: Smart Resume Generator (AI) */}
-            <div className="bg-gradient-to-r from-primary-600 to-primary-500 rounded-xl shadow-sm p-6 text-white">
+            {/* Smart Resume Generator (AI) */}
+            <div className="bg-gradient-to-r from-primary-600 to-primary-500 rounded-xl shadow-sm p-6 text-white mb-8">
               <div className="flex items-start">
                 <div className="mr-4 mt-1">
                   <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
@@ -331,33 +544,49 @@ const ResumeBuilder = () => {
                 </div>
                 <div className="flex-grow">
                   <h3 className="text-xl font-semibold mb-2">AI Resume Enhancement</h3>
-                  <p className="text-white/80 mb-4">
-                    Let our AI analyze your resume content and suggest professional improvements that align with your career goals.
-                  </p>
+                  
+                  {resumeIntent.type === 'company' && companyPreference ? (
+                    <p className="text-white/90 mb-4">
+                      Optimize your resume specifically for <span className="font-bold">{companyPreference.name}</span>. 
+                      Our AI will tailor your content to match their preferences and hiring patterns.
+                    </p>
+                  ) : (
+                    <p className="text-white/90 mb-4">
+                      Let our AI analyze and enhance your resume content for your selected resume type, 
+                      highlighting your most relevant qualifications.
+                    </p>
+                  )}
+                  
                   <ul className="space-y-2 mb-6">
                     <li className="flex items-start">
                       <span className="bg-white/20 rounded-full p-1 mr-2 mt-0.5">
-                        <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
+                        <Check className="h-3 w-3" />
                       </span>
-                      <span className="text-sm">Professionally rewrite your summary and descriptions</span>
+                      <span className="text-sm">
+                        {resumeIntent.type === 'company' && companyPreference
+                          ? `Align with ${companyPreference.name}'s preferred keywords and values`
+                          : "Professionally rewrite your summary and descriptions"}
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <span className="bg-white/20 rounded-full p-1 mr-2 mt-0.5">
-                        <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
+                        <Check className="h-3 w-3" />
                       </span>
-                      <span className="text-sm">Adapt content tone for your selected resume type</span>
+                      <span className="text-sm">
+                        {resumeIntent.type === 'company' && companyPreference
+                          ? `Emphasize skills and experiences ${companyPreference.name} values most`
+                          : "Highlight relevant skills for your chosen career path"}
+                      </span>
                     </li>
                     <li className="flex items-start">
                       <span className="bg-white/20 rounded-full p-1 mr-2 mt-0.5">
-                        <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
+                        <Check className="h-3 w-3" />
                       </span>
-                      <span className="text-sm">Highlight relevant skills and achievements</span>
+                      <span className="text-sm">
+                        {resumeIntent.type === 'company' && companyPreference
+                          ? `Structure content based on ${companyPreference.name}'s preferred format`
+                          : "Adapt content tone for your selected resume type"}
+                      </span>
                     </li>
                   </ul>
                   <Button 
@@ -368,11 +597,15 @@ const ResumeBuilder = () => {
                     {isAiGenerating ? (
                       <>
                         <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2"></div>
-                        Enhancing Resume...
+                        {resumeIntent.type === 'company' && companyPreference
+                          ? `Optimizing for ${companyPreference.name}...`
+                          : "Enhancing Resume..."}
                       </>
                     ) : (
                       <>
-                        Generate using AI
+                        {resumeIntent.type === 'company' && companyPreference
+                          ? `Optimize for ${companyPreference.name}`
+                          : "Generate with AI"}
                       </>
                     )}
                   </Button>
@@ -385,16 +618,183 @@ const ResumeBuilder = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Resume Tips Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+              <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-900">
+                <Lightbulb className="h-5 w-5 text-amber-500 mr-2" />
+                Resume Tips
+                {resumeIntent.type === 'company' && companyPreference && (
+                  <Badge className="ml-2 bg-indigo-100 text-indigo-800 border-indigo-200">
+                    {companyPreference.name} Specific
+                  </Badge>
+                )}
+              </h3>
+              
+              <ul className="space-y-3 pl-2">
+                {getTips().map((tip, index) => (
+                  <li key={index} className="flex items-start">
+                    <span className="bg-amber-100 text-amber-800 rounded-full p-0.5 mr-2 mt-1">
+                      <Check className="h-3.5 w-3.5" />
+                    </span>
+                    <span className="text-gray-700">{tip}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              {/* Extra context for company specific resume */}
+              {resumeIntent.type === 'company' && companyPreference && (
+                <div className="mt-6 bg-indigo-50 rounded-lg p-4">
+                  <div className="flex items-start">
+                    <Info className="h-5 w-5 text-indigo-600 mr-2 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-medium text-indigo-900 mb-1">About {companyPreference.name}</h4>
+                      <p className="text-sm text-indigo-800 mb-2">
+                        Industry: {companyPreference.industry}
+                      </p>
+                      <div className="mb-2">
+                        <span className="text-xs font-medium text-indigo-900 block mb-1.5">Resume Format Preferences:</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          <Badge variant="outline" className="bg-white/80 text-xs">
+                            {companyPreference.resumePreferences.format}
+                          </Badge>
+                          <Badge variant="outline" className="bg-white/80 text-xs">
+                            {companyPreference.resumePreferences.tone} tone
+                          </Badge>
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-xs font-medium text-indigo-900 block mb-1.5">Key Focus Areas:</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {companyPreference.resumePreferences.emphasisOn.map((emphasis: string, i: number) => (
+                            <Badge key={i} variant="outline" className="bg-white/80 text-xs">
+                              {emphasis}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Sample Resumes Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold flex items-center text-gray-900">
+                  <BookOpen className="h-5 w-5 text-emerald-500 mr-2" />
+                  Sample Resumes
+                  {resumeIntent.type === 'company' && companyPreference && (
+                    <Badge className="ml-2 bg-indigo-100 text-indigo-800 border-indigo-200">
+                      For {companyPreference.name}
+                    </Badge>
+                  )}
+                </h3>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowSampleResumes(!showSampleResumes)}
+                >
+                  {showSampleResumes ? "Hide Samples" : "Show Samples"}
+                </Button>
+              </div>
+              
+              {showSampleResumes && (
+                <div className="space-y-4">
+                  {getSampleResumes().map(resume => (
+                    <div 
+                      key={resume.id} 
+                      className="border border-gray-200 rounded-lg overflow-hidden"
+                    >
+                      <div 
+                        className="p-4 bg-gray-50 flex justify-between items-center cursor-pointer"
+                        onClick={() => toggleSampleResume(resume.id)}
+                      >
+                        <div>
+                          <div className="flex items-center">
+                            <span className="font-medium text-gray-900">{resume.role}</span>
+                            <Badge className="ml-2 bg-green-100 text-green-800 border-green-200">
+                              {resume.result}
+                            </Badge>
+                          </div>
+                          <div className="text-sm text-gray-500">{resume.company}</div>
+                        </div>
+                        <div className="flex items-center text-gray-400">
+                          {activeSampleResume === resume.id ? "Hide" : "View"} 
+                          <svg 
+                            className={`h-5 w-5 ml-1 transition-transform ${activeSampleResume === resume.id ? 'rotate-180' : ''}`} 
+                            fill="none" 
+                            viewBox="0 0 24 24" 
+                            stroke="currentColor"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </div>
+                      
+                      {activeSampleResume === resume.id && (
+                        <div className="p-4 border-t border-gray-200">
+                          <h4 className="font-medium text-gray-900 mb-2">Key Resume Highlights:</h4>
+                          <ul className="space-y-2 ml-2">
+                            {resume.highlights.map((highlight, index) => (
+                              <li key={index} className="flex items-start">
+                                <Star className="h-4 w-4 text-amber-500 mr-2 mt-0.5" />
+                                <span className="text-sm text-gray-700">{highlight}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-
-          {/* Section 5: Live Preview + Template Selection */}
-          <div className="lg:w-1/3 order-1 lg:order-2">
+          
+          {/* Right column - Preview and actions */}
+          <div className="lg:w-2/5">
+            {/* Smart suggestions based on company or type */}
+            {resumeIntent.type === 'company' && companyPreference && (
+              <div className="bg-indigo-50 rounded-xl p-5 mb-8 border border-indigo-100">
+                <div className="flex items-start">
+                  <MessageSquare className="h-5 w-5 text-indigo-600 mr-3 mt-0.5" />
+                  <div>
+                    <h3 className="font-semibold text-indigo-900 mb-1">Smart Suggestions for {companyPreference.name}</h3>
+                    <p className="text-sm text-indigo-800 mb-3">
+                      After generating your resume, you can use these options to fine-tune it:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button size="sm" variant="outline" className="bg-white">
+                        <PenTool className="h-3.5 w-3.5 mr-1.5" />
+                        Highlight Technical Skills
+                      </Button>
+                      <Button size="sm" variant="outline" className="bg-white">
+                        <MessageSquare className="h-3.5 w-3.5 mr-1.5" />
+                        More Corporate Tone
+                      </Button>
+                      <Button size="sm" variant="outline" className="bg-white">
+                        <Star className="h-3.5 w-3.5 mr-1.5" />
+                        Add Quantifiable Results
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Resume Preview */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
-              <div className="border-b border-gray-100 p-4">
+              <div className="border-b border-gray-100 p-4 flex justify-between items-center">
                 <h3 className="text-lg font-semibold flex items-center">
                   <FileText className="h-5 w-5 text-primary-600 mr-2" />
                   Resume Preview
                 </h3>
+                <div className="flex items-center text-sm text-gray-500">
+                  <span className="mr-2">Template:</span>
+                  <span className="font-medium capitalize">{selectedTemplate}</span>
+                </div>
               </div>
               <div className="p-4">
                 <div className="bg-gray-50 p-4 rounded-lg mb-4">
@@ -405,38 +805,42 @@ const ResumeBuilder = () => {
                     />
                   </div>
                 </div>
-                <div className="flex gap-2 mb-4">
-                  <Button variant="outline" className="w-full" size="sm" onClick={handlePrint}>
-                    <Printer className="h-4 w-4 mr-1.5" />
-                    Print
-                  </Button>
-                  <Button className="w-full bg-primary-600 hover:bg-primary-700" size="sm" onClick={handleDownloadPDF}>
-                    <Download className="h-4 w-4 mr-1.5" />
-                    Download
-                  </Button>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Button variant="outline" size="sm" className="justify-start text-gray-600">
-                    <Save className="h-4 w-4 mr-1.5" />
-                    Save to Profile
-                  </Button>
-                  <Button variant="outline" size="sm" className="justify-start text-gray-600">
-                    <Share2 className="h-4 w-4 mr-1.5" />
-                    Share Resume
-                  </Button>
-                  <Button variant="outline" size="sm" className="justify-start text-gray-600">
-                    <Link2 className="h-4 w-4 mr-1.5" />
-                    Get Shareable Link
-                  </Button>
+                
+                {/* Action buttons */}
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button className="w-full bg-primary-600 hover:bg-primary-700" onClick={handleDownloadPDF}>
+                      <Download className="h-4 w-4 mr-1.5" />
+                      Download PDF
+                    </Button>
+                    <Button variant="outline" className="w-full" onClick={handlePrint}>
+                      <Printer className="h-4 w-4 mr-1.5" />
+                      Print
+                    </Button>
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div className="flex flex-col gap-3">
+                    <Button variant="outline" className="justify-start" onClick={handleSaveResume}>
+                      <Save className="h-4 w-4 mr-1.5" />
+                      Save Resume
+                    </Button>
+                    <Button variant="outline" className="justify-start">
+                      <Share2 className="h-4 w-4 mr-1.5" />
+                      Share Resume
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            
+            {/* Template Selection */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
               <div className="border-b border-gray-100 p-4">
                 <h3 className="text-lg font-semibold flex items-center">
                   <FileStack className="h-5 w-5 text-primary-600 mr-2" />
-                  Template Style
+                  Template
                 </h3>
               </div>
               <div className="p-4">
@@ -497,7 +901,7 @@ const ResumeBuilder = () => {
                   className="w-full justify-center text-primary-600"
                   onClick={() => setActiveTab("templates")}
                 >
-                  View All Templates
+                  Browse All Templates
                 </Button>
               </div>
             </div>

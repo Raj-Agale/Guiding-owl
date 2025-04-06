@@ -1,0 +1,62 @@
+Build an advanced Resume Builder component as part of an AI career guidance app called "OwlPath". This resume builder should not just generate resumes by type, but allow users to input a specific company name, and get personalized resume suggestions based on that company’s hiring trends and preferences.
+
+🏗️ Core Features:
+
+1. 🧠 Resume Intent Selector
+   - Let user pick a goal:
+     - “Apply to [College/Internship/Job/Freelance]”
+     - OR type: “Company Name” → trigger company-specific logic
+   - Example input: “Google SWE Internship”, “McKinsey”, “Netflix UI Designer”, “IIT-B Undergraduate Admission”
+
+2. 🗂️ Auto-Resume Profile Layout Generator
+   - Based on the goal or company input, auto-adjust:
+     - Resume layout
+     - Section order (e.g., Projects first for Google, Leadership first for McKinsey)
+     - Tone (e.g., analytical for consultancies, clean & creative for design jobs)
+
+3. 🤖 AI Resume Generator
+   - Generates section content based on user profile (can be dummy or user-filled data for now)
+   - Adapts to:
+     - Company-specific preferences
+     - Keywords from job postings
+     - Industry norms (e.g., quantifiable achievements for finance)
+
+4. 🧾 Live Resume Preview
+   - PDF-like live preview with 2–3 templates:
+     - Corporate
+     - Creative
+     - Academic
+
+5. 💡 Resume Tips Section
+   - If company is entered:
+     - Show company-specific resume tips, like:
+       - “Use metrics. Google prefers resumes with impact: e.g., ‘Increased system performance by 35%’”
+       - “Avoid fluff. Apple hiring managers prefer minimalist, focused bullet points.”
+   - If no company is entered:
+     - Show general tips based on goal (College, Internship, etc.)
+
+6. 📂 Real Resume Examples Section
+   - Fetch or show sample resumes of successful applicants (use placeholders for now)
+   - Format:
+     - Company: Google
+     - Role: SWE Intern
+     - Result: Selected
+     - Highlights: Used X, Y, Z, layout was 1 page, emphasis on coding competitions
+
+7. 🧭 Smart Suggestions
+   - After resume is generated, offer optional:
+     - “Optimize for [X] Company” (regenerates bullet points)
+     - “Highlight [X] Skill More”
+     - “Adjust Tone: More Corporate / More Startup / More Creative”
+
+📦 Tech Stack Notes:
+- Use Tailwind + React
+- Keep frontend-only for now, mock AI functions
+- Company info can be stored in a `data/companyPreferences.js` file (include 5–10 dummy ones for testing)
+- Future TODO: connect to AI API for real-time company info & resume parsing
+
+📁 Suggested Structure:
+- `components/ResumeBuilder.jsx`
+- `utils/companyResumeTips.js`
+- `ai/generateResumeContent.js`
+- `data/sampleResumes.js`
