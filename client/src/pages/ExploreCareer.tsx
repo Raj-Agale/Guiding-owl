@@ -122,13 +122,97 @@ const ExploreCareer = () => {
     <main className="pt-8 pb-16 min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header with gradient text */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-400">
             Explore Career Paths
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Discover and learn about various career paths to find the right fit for your interests and goals.
           </p>
+        </div>
+        
+        {/* Featured Careers Section */}
+        <div className="mb-16">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Featured Career Paths</h2>
+            <Button variant="link" className="text-primary-600 font-medium p-0">
+              View all categories <ArrowRight className="ml-1 h-4 w-4" />
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Technology Card */}
+            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-md hover:shadow-lg transition-all group overflow-hidden relative">
+              <div className="absolute inset-0 bg-[url('/img/grid.svg')] opacity-10"></div>
+              <div className="relative z-10">
+                <div className="bg-white/20 backdrop-blur-sm w-16 h-16 rounded-xl flex items-center justify-center mb-4">
+                  <Code className="h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Technology</h3>
+                <p className="text-white/80 mb-4">Explore careers in software, data science, cybersecurity and more</p>
+                <div className="flex items-center text-sm text-white/90 mb-6">
+                  <DollarSign className="h-4 w-4 mr-1" />
+                  <span className="mr-3">High salary range</span>
+                  <TrendingUp className="h-4 w-4 mr-1" />
+                  <span>High demand</span>
+                </div>
+                <Link href="/explore?category=Technology">
+                  <Button className="bg-white/20 hover:bg-white/30 text-white group-hover:pl-6 transition-all duration-300">
+                    Explore
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            
+            {/* Healthcare Card */}
+            <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl p-6 text-white shadow-md hover:shadow-lg transition-all group overflow-hidden relative">
+              <div className="absolute inset-0 bg-[url('/img/grid.svg')] opacity-10"></div>
+              <div className="relative z-10">
+                <div className="bg-white/20 backdrop-blur-sm w-16 h-16 rounded-xl flex items-center justify-center mb-4">
+                  <Stethoscope className="h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Healthcare</h3>
+                <p className="text-white/80 mb-4">Discover opportunities in medicine, nursing, therapy and more</p>
+                <div className="flex items-center text-sm text-white/90 mb-6">
+                  <GraduationCap className="h-4 w-4 mr-1" />
+                  <span className="mr-3">Advanced degrees</span>
+                  <TrendingUp className="h-4 w-4 mr-1" />
+                  <span>Stable demand</span>
+                </div>
+                <Link href="/explore?category=Healthcare">
+                  <Button className="bg-white/20 hover:bg-white/30 text-white group-hover:pl-6 transition-all duration-300">
+                    Explore
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            
+            {/* Business Card */}
+            <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl p-6 text-white shadow-md hover:shadow-lg transition-all group overflow-hidden relative">
+              <div className="absolute inset-0 bg-[url('/img/grid.svg')] opacity-10"></div>
+              <div className="relative z-10">
+                <div className="bg-white/20 backdrop-blur-sm w-16 h-16 rounded-xl flex items-center justify-center mb-4">
+                  <LineChart className="h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Business</h3>
+                <p className="text-white/80 mb-4">Explore careers in management, finance, marketing and more</p>
+                <div className="flex items-center text-sm text-white/90 mb-6">
+                  <Briefcase className="h-4 w-4 mr-1" />
+                  <span className="mr-3">Growth potential</span>
+                  <Globe className="h-4 w-4 mr-1" />
+                  <span>Global opportunities</span>
+                </div>
+                <Link href="/explore?category=Business">
+                  <Button className="bg-white/20 hover:bg-white/30 text-white group-hover:pl-6 transition-all duration-300">
+                    Explore
+                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Search and filter section with improved styling */}
