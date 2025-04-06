@@ -269,16 +269,16 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
         collapsible
         value={activeSection}
         onValueChange={setActiveSection}
-        className="space-y-4"
+        className="space-y-5"
       >
-        <AccordionItem value="personal-info" className="border rounded-lg shadow-sm">
-          <AccordionTrigger className="px-4 py-2 hover:no-underline">
-            <div className="flex items-center gap-2">
+        <AccordionItem value="personal-info" className="border border-gray-200/70 rounded-lg shadow-sm bg-white/90 backdrop-blur-sm overflow-hidden">
+          <AccordionTrigger className="px-5 py-4 hover:no-underline bg-gray-50/80 hover:bg-gray-50/90 transition-colors">
+            <div className="flex items-center gap-3">
               <UserCircle className="h-5 w-5 text-primary-600" />
               <span className="font-medium">Personal Information</span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 py-4">
+          <AccordionContent className="px-5 py-6">
             <Form {...personalInfoForm}>
               <form onSubmit={personalInfoForm.handleSubmit(onPersonalInfoSubmit)} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -374,7 +374,10 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
                 />
 
                 <div className="flex justify-end pt-2">
-                  <Button type="submit">
+                  <Button 
+                    type="submit"
+                    className="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+                  >
                     Save & Continue
                   </Button>
                 </div>
@@ -383,14 +386,14 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="education" className="border rounded-lg shadow-sm">
-          <AccordionTrigger className="px-4 py-2 hover:no-underline">
-            <div className="flex items-center gap-2">
+        <AccordionItem value="education" className="border border-gray-200/70 rounded-lg shadow-sm bg-white/90 backdrop-blur-sm overflow-hidden">
+          <AccordionTrigger className="px-5 py-4 hover:no-underline bg-gray-50/80 hover:bg-gray-50/90 transition-colors">
+            <div className="flex items-center gap-3">
               <GraduationCap className="h-5 w-5 text-primary-600" />
               <span className="font-medium">Education</span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 py-4">
+          <AccordionContent className="px-5 py-6">
             {resumeData.education.map((edu, index) => (
               <div key={edu.id} className="mb-6 last:mb-0">
                 {index > 0 && <Separator className="mb-6" />}
@@ -497,6 +500,7 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
               <Button 
                 type="button" 
                 variant="outline"
+                className="border-primary-300 text-primary-700 hover:bg-primary-50 hover:text-primary-800 transition-colors"
                 onClick={addEducation}
               >
                 <Plus className="h-4 w-4 mr-1" />
@@ -504,6 +508,7 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
               </Button>
               <Button 
                 type="button"
+                className="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
                 onClick={() => setActiveSection("experience")}
               >
                 Continue to Experience
@@ -512,14 +517,14 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="experience" className="border rounded-lg shadow-sm">
-          <AccordionTrigger className="px-4 py-2 hover:no-underline">
-            <div className="flex items-center gap-2">
+        <AccordionItem value="experience" className="border border-gray-200/70 rounded-lg shadow-sm bg-white/90 backdrop-blur-sm overflow-hidden">
+          <AccordionTrigger className="px-5 py-4 hover:no-underline bg-gray-50/80 hover:bg-gray-50/90 transition-colors">
+            <div className="flex items-center gap-3">
               <Briefcase className="h-5 w-5 text-primary-600" />
               <span className="font-medium">Work Experience</span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 py-4">
+          <AccordionContent className="px-5 py-6">
             {resumeData.experience.map((exp, index) => (
               <div key={exp.id} className="mb-6 last:mb-0">
                 {index > 0 && <Separator className="mb-6" />}
@@ -634,6 +639,7 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
               <Button 
                 type="button" 
                 variant="outline"
+                className="border-primary-300 text-primary-700 hover:bg-primary-50 hover:text-primary-800 transition-colors"
                 onClick={addExperience}
               >
                 <Plus className="h-4 w-4 mr-1" />
@@ -641,6 +647,7 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
               </Button>
               <Button 
                 type="button"
+                className="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
                 onClick={() => setActiveSection("skills")}
               >
                 Continue to Skills
@@ -649,14 +656,14 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="skills" className="border rounded-lg shadow-sm">
-          <AccordionTrigger className="px-4 py-2 hover:no-underline">
-            <div className="flex items-center gap-2">
+        <AccordionItem value="skills" className="border border-gray-200/70 rounded-lg shadow-sm bg-white/90 backdrop-blur-sm overflow-hidden">
+          <AccordionTrigger className="px-5 py-4 hover:no-underline bg-gray-50/80 hover:bg-gray-50/90 transition-colors">
+            <div className="flex items-center gap-3">
               <Code className="h-5 w-5 text-primary-600" />
               <span className="font-medium">Skills</span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 py-4">
+          <AccordionContent className="px-5 py-6">
             <div className="space-y-4">
               {resumeData.skills.map((skill, index) => (
                 <div key={skill.id} className="flex items-center space-x-4">
@@ -696,6 +703,7 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
               <Button 
                 type="button" 
                 variant="outline"
+                className="border-primary-300 text-primary-700 hover:bg-primary-50 hover:text-primary-800 transition-colors"
                 onClick={addSkill}
               >
                 <Plus className="h-4 w-4 mr-1" />
@@ -703,6 +711,7 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
               </Button>
               <Button 
                 type="button"
+                className="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
                 onClick={() => setActiveSection("projects")}
               >
                 Continue to Projects
@@ -711,14 +720,14 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="projects" className="border rounded-lg shadow-sm">
-          <AccordionTrigger className="px-4 py-2 hover:no-underline">
-            <div className="flex items-center gap-2">
+        <AccordionItem value="projects" className="border border-gray-200/70 rounded-lg shadow-sm bg-white/90 backdrop-blur-sm overflow-hidden">
+          <AccordionTrigger className="px-5 py-4 hover:no-underline bg-gray-50/80 hover:bg-gray-50/90 transition-colors">
+            <div className="flex items-center gap-3">
               <Code className="h-5 w-5 text-primary-600" />
               <span className="font-medium">Projects</span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 py-4">
+          <AccordionContent className="px-5 py-6">
             {resumeData.projects.map((project, index) => (
               <div key={project.id} className="mb-6 last:mb-0">
                 {index > 0 && <Separator className="mb-6" />}
@@ -798,6 +807,7 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
               <Button 
                 type="button" 
                 variant="outline"
+                className="border-primary-300 text-primary-700 hover:bg-primary-50 hover:text-primary-800 transition-colors"
                 onClick={addProject}
               >
                 <Plus className="h-4 w-4 mr-1" />
@@ -805,6 +815,7 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
               </Button>
               <Button 
                 type="button"
+                className="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
                 onClick={() => setActiveSection("certifications")}
               >
                 Continue to Certifications
@@ -813,14 +824,14 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
           </AccordionContent>
         </AccordionItem>
 
-        <AccordionItem value="certifications" className="border rounded-lg shadow-sm">
-          <AccordionTrigger className="px-4 py-2 hover:no-underline">
-            <div className="flex items-center gap-2">
+        <AccordionItem value="certifications" className="border border-gray-200/70 rounded-lg shadow-sm bg-white/90 backdrop-blur-sm overflow-hidden">
+          <AccordionTrigger className="px-5 py-4 hover:no-underline bg-gray-50/80 hover:bg-gray-50/90 transition-colors">
+            <div className="flex items-center gap-3">
               <Award className="h-5 w-5 text-primary-600" />
               <span className="font-medium">Certifications</span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="px-4 py-4">
+          <AccordionContent className="px-5 py-6">
             {resumeData.certifications.map((cert, index) => (
               <div key={cert.id} className="mb-6 last:mb-0">
                 {index > 0 && <Separator className="mb-6" />}
@@ -891,6 +902,7 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
               <Button 
                 type="button" 
                 variant="outline"
+                className="border-primary-300 text-primary-700 hover:bg-primary-50 hover:text-primary-800 transition-colors"
                 onClick={addCertification}
               >
                 <Plus className="h-4 w-4 mr-1" />
@@ -898,6 +910,7 @@ const ResumeForm = ({ resumeData, setResumeData }: ResumeFormProps) => {
               </Button>
               <Button 
                 type="button"
+                className="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
                 onClick={() => alert("Resume data updated. You can now preview your resume.")}
               >
                 Finish Resume

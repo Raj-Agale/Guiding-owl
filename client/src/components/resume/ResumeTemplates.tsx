@@ -13,28 +13,28 @@ const templates = [
     name: "Modern",
     description: "Clean, professional design with a touch of color",
     popular: true,
-    color: "from-blue-400 to-indigo-500"
+    color: "from-[#a48b7b] to-[#8d7a6a]"
   },
   {
     id: "classic",
     name: "Classic",
     description: "Traditional layout perfect for conservative industries",
     popular: false,
-    color: "from-gray-400 to-gray-600"
+    color: "from-[#9f9081] to-[#7d7266]"
   },
   {
     id: "creative",
     name: "Creative",
     description: "Bold design for creative professionals",
     popular: true,
-    color: "from-purple-400 to-pink-500"
+    color: "from-[#b79a83] to-[#96826e]"
   },
   {
     id: "minimalist",
     name: "Minimalist",
     description: "Simple, elegant layout focusing on content",
     popular: false,
-    color: "from-green-400 to-teal-500"
+    color: "from-[#a59888] to-[#887b6c]"
   }
 ];
 
@@ -87,7 +87,7 @@ const ResumeTemplates = ({ selectedTemplate, onSelectTemplate }: ResumeTemplates
               
               {/* Popular tag */}
               {template.popular && (
-                <div className="absolute top-3 left-3 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs px-2 py-1 rounded-full shadow-md flex items-center">
+                <div className="absolute top-3 left-3 bg-gradient-to-r from-[#a97e58] to-[#8a6845] text-white text-xs px-2 py-1 rounded-full shadow-md flex items-center">
                   <Sparkles className="h-3 w-3 mr-1" />
                   <span>Popular</span>
                 </div>
@@ -104,7 +104,7 @@ const ResumeTemplates = ({ selectedTemplate, onSelectTemplate }: ResumeTemplates
                 {selectedTemplate === template.id ? (
                   <Button 
                     size="sm" 
-                    className="bg-primary-600 hover:bg-primary-700"
+                    className="bg-[#9a7c5c] hover:bg-[#8a6c4c] text-white"
                   >
                     Selected
                   </Button>
@@ -112,6 +112,7 @@ const ResumeTemplates = ({ selectedTemplate, onSelectTemplate }: ResumeTemplates
                   <Button 
                     variant="outline" 
                     size="sm"
+                    className="border-[#e9e2d8] hover:bg-[#f8f5f0] hover:text-[#9a7c5c]"
                     onClick={() => onSelectTemplate(template.id)}
                   >
                     Select
@@ -127,7 +128,7 @@ const ResumeTemplates = ({ selectedTemplate, onSelectTemplate }: ResumeTemplates
         <Button 
           disabled={!selectedTemplate}
           onClick={() => onSelectTemplate(selectedTemplate)}
-          className="px-8 bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+          className="px-8 bg-gradient-to-r from-[#9a7c5c] to-[#7d6c57] hover:from-[#8a6c4c] hover:to-[#6d5c47] text-white shadow-md hover:shadow-lg transition-all"
           size="lg"
         >
           Continue with {templates.find(t => t.id === selectedTemplate)?.name || ''} Template

@@ -99,10 +99,10 @@ const ResumeBuilder = () => {
   };
 
   return (
-    <main className="min-h-screen py-10 bg-gradient-to-b from-white to-gray-50">
+    <main className="min-h-screen py-10 bg-[#f5f2ee]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600">
+          <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-purple-700">
             Resume Builder
           </h1>
           <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
@@ -111,13 +111,13 @@ const ResumeBuilder = () => {
         </div>
 
         <div className="relative mb-8 mx-auto max-w-3xl">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary-100 to-purple-100 blur rounded-lg"></div>
-          <div className="relative bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+          <div className="absolute inset-0 bg-[#e8e1d5] rounded-xl"></div>
+          <div className="relative bg-white/95 backdrop-blur-sm rounded-xl shadow-sm border border-[#e9e2d8]/70 p-5">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto bg-gray-100/80">
-                <TabsTrigger value="templates" className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm">Templates</TabsTrigger>
-                <TabsTrigger value="create" className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm">Create</TabsTrigger>
-                <TabsTrigger value="preview" className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm">Preview</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto bg-[#f2ece3]/80 border border-[#e9e2d8] rounded-md">
+                <TabsTrigger value="templates" className="data-[state=active]:bg-white data-[state=active]:text-primary-700 data-[state=active]:shadow-sm">Templates</TabsTrigger>
+                <TabsTrigger value="create" className="data-[state=active]:bg-white data-[state=active]:text-primary-700 data-[state=active]:shadow-sm">Create</TabsTrigger>
+                <TabsTrigger value="preview" className="data-[state=active]:bg-white data-[state=active]:text-primary-700 data-[state=active]:shadow-sm">Preview</TabsTrigger>
               </TabsList>
 
               <TabsContent value="templates" className="space-y-4">
@@ -130,13 +130,14 @@ const ResumeBuilder = () => {
               <TabsContent value="create" className="space-y-4">
                 <div className="flex justify-between items-center mb-6">
                   <div className="flex items-center gap-2">
-                    <Pencil className="h-5 w-5 text-primary-600" />
+                    <Pencil className="h-5 w-5 text-[#9a7c5c]" />
                     <h2 className="text-xl font-semibold">Edit Your Resume</h2>
                   </div>
                   <div className="flex space-x-2">
                     <Button 
                       variant="outline" 
                       size="sm"
+                      className="border-[#e9e2d8] hover:bg-[#f8f5f0] hover:text-[#9a7c5c]"
                       onClick={() => setActiveTab("templates")}
                     >
                       Change Template
@@ -144,6 +145,7 @@ const ResumeBuilder = () => {
                     <Button 
                       variant="outline" 
                       size="sm"
+                      className="border-[#e9e2d8] hover:bg-[#f8f5f0] hover:text-[#9a7c5c]"
                       onClick={() => setActiveTab("preview")}
                     >
                       Preview
@@ -160,13 +162,14 @@ const ResumeBuilder = () => {
               <TabsContent value="preview" className="space-y-4">
                 <div className="flex justify-between items-center mb-6">
                   <div className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-primary-600" />
+                    <FileText className="h-5 w-5 text-[#9a7c5c]" />
                     <h2 className="text-xl font-semibold">Resume Preview</h2>
                   </div>
                   <div className="flex space-x-2">
                     <Button 
                       variant="outline"
                       size="sm"
+                      className="border-[#e9e2d8] hover:bg-[#f8f5f0] hover:text-[#9a7c5c]"
                       onClick={() => setActiveTab("create")}
                     >
                       Back to Editor
@@ -174,6 +177,7 @@ const ResumeBuilder = () => {
                     <Button 
                       variant="outline"
                       size="sm"
+                      className="border-[#e9e2d8] hover:bg-[#f8f5f0] hover:text-[#9a7c5c]"
                       onClick={handlePrint}
                     >
                       <Printer className="h-4 w-4 mr-1" />
@@ -181,6 +185,7 @@ const ResumeBuilder = () => {
                     </Button>
                     <Button 
                       size="sm"
+                      className="bg-gradient-to-r from-[#9a7c5c] to-[#7d6c57] hover:from-[#8a6c4c] hover:to-[#6d5c47] text-white shadow-sm"
                       onClick={handleDownloadPDF}
                     >
                       <Download className="h-4 w-4 mr-1" />
@@ -199,7 +204,10 @@ const ResumeBuilder = () => {
                 </Card>
 
                 <div className="flex justify-center mt-6">
-                  <Button onClick={handleSaveResume}>
+                  <Button 
+                    onClick={handleSaveResume}
+                    className="bg-gradient-to-r from-[#9a7c5c] to-[#7d6c57] hover:from-[#8a6c4c] hover:to-[#6d5c47] text-white shadow-sm px-8 py-2"
+                  >
                     Save Resume
                   </Button>
                 </div>
