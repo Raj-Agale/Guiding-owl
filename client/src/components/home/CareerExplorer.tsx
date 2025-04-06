@@ -28,7 +28,7 @@ const CareerExplorer = () => {
     if (careerPaths) {
       let result = [...careerPaths];
       
-      if (category) {
+      if (category && category !== "all") {
         result = result.filter(path => path.category.toLowerCase() === category.toLowerCase());
       }
       
@@ -91,7 +91,7 @@ const CareerExplorer = () => {
               <SelectValue placeholder="Filter by category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               <SelectItem value="Technology">Technology</SelectItem>
               <SelectItem value="Healthcare">Healthcare</SelectItem>
               <SelectItem value="Business">Business</SelectItem>

@@ -3,7 +3,16 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Search, 
+  Clock, 
+  GraduationCap,
+  DollarSign,
+  Briefcase,
+  ArrowRight,
+  BookOpen
+} from "lucide-react";
 import { 
   Select, 
   SelectContent, 
@@ -15,7 +24,7 @@ import { CareerPath } from "@shared/schema";
 import { getCareerPaths, searchCareerPaths, getCareerPathsByCategory } from "@/lib/data";
 
 const categories = [
-  { value: "", label: "All Categories" },
+  { value: "all", label: "All Categories" },
   { value: "Technology", label: "Technology" },
   { value: "Healthcare", label: "Healthcare" },
   { value: "Business", label: "Business" },
@@ -24,9 +33,16 @@ const categories = [
   { value: "Education", label: "Education" }
 ];
 
+// Color mappings for demand levels
+const demandLevelColors = {
+  "High Demand": "bg-green-100 text-green-800 border-green-300",
+  "Growing": "bg-blue-100 text-blue-800 border-blue-300",
+  "Stable": "bg-orange-100 text-orange-800 border-orange-300"
+};
+
 const ExploreCareer = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [filteredCareers, setFilteredCareers] = useState<CareerPath[]>([]);
 
   const { data: careerPaths, isLoading } = useQuery({
@@ -43,7 +59,7 @@ const ExploreCareer = () => {
   const handleCategoryChange = async (category: string) => {
     setSelectedCategory(category);
     
-    if (!category) {
+    if (!category || category === "all") {
       // Reset to all careers
       setFilteredCareers(careerPaths || []);
       return;
@@ -92,11 +108,16 @@ const ExploreCareer = () => {
     }
   };
 
+  const getDemandColor = (demandLevel: string) => {
+    return demandLevelColors[demandLevel as keyof typeof demandLevelColors] || "bg-gray-100 text-gray-800 border-gray-300";
+  };
+
   return (
-    <main className="pt-8 pb-16 bg-gray-50 min-h-screen">
+    <main className="pt-8 pb-16 min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+        {/* Header with gradient text */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-400">
             Explore Career Paths
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -104,91 +125,120 @@ const ExploreCareer = () => {
           </p>
         </div>
 
-        <div className="flex flex-col md:flex-row mb-10 space-y-4 md:space-y-0 md:space-x-4">
-          <div className="relative flex-grow">
-            <Input
-              type="text"
-              placeholder="Search careers..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="w-full py-3 pr-12"
-            />
-            <button 
-              className="absolute right-3 top-3 text-gray-400"
+        {/* Search and filter section with improved styling */}
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-10">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="relative flex-grow">
+              <Input
+                type="text"
+                placeholder="Search careers by title or keywords..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="w-full py-3 pl-10 pr-4 border-gray-300 focus:border-primary-500 focus:ring focus:ring-primary-200"
+              />
+              <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+            </div>
+            <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+              <SelectTrigger className="w-full md:w-[220px] border-gray-300">
+                <SelectValue placeholder="Filter by category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.value} value={category.value || "placeholder"}>
+                    {category.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button 
               onClick={handleSearch}
-              aria-label="Search"
+              className="bg-primary-600 hover:bg-primary-700 text-white"
             >
-              <Search className="h-6 w-6" />
-            </button>
+              Search
+            </Button>
           </div>
-          <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-            <SelectTrigger className="w-full md:w-[200px]">
-              <SelectValue placeholder="Filter by category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((category) => (
-                <SelectItem key={category.value} value={category.value}>
-                  {category.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {(searchTerm || (selectedCategory && selectedCategory !== "all")) && (
+            <div className="flex items-center mt-4 text-sm text-gray-500">
+              <p>
+                Showing results for 
+                {searchTerm && <span className="font-medium"> "{searchTerm}"</span>}
+                {searchTerm && selectedCategory && selectedCategory !== "all" && <span> in </span>}
+                {selectedCategory && selectedCategory !== "all" && <span className="font-medium">{categories.find(c => c.value === selectedCategory)?.label}</span>}
+              </p>
+              <Button 
+                variant="link" 
+                className="ml-2 p-0 h-auto text-sm text-primary-600"
+                onClick={() => {
+                  setSearchTerm("");
+                  setSelectedCategory("all");
+                  setFilteredCareers(careerPaths || []);
+                }}
+              >
+                Clear all
+              </Button>
+            </div>
+          )}
         </div>
 
+        {/* Category chips for quick filtering */}
+        <div className="flex flex-wrap gap-2 mb-8">
+          {categories.map((category) => (
+            <Badge 
+              key={category.value}
+              variant={selectedCategory === category.value ? "default" : "outline"}
+              className={`px-4 py-2 text-sm cursor-pointer hover:bg-primary-50 ${
+                selectedCategory === category.value 
+                  ? "bg-primary-100 text-primary-800 hover:bg-primary-200" 
+                  : "bg-white"
+              }`}
+              onClick={() => handleCategoryChange(category.value)}
+            >
+              {category.label}
+            </Badge>
+          ))}
+        </div>
+
+        {/* Loading, empty, and results states */}
         {isLoading ? (
           <div className="text-center py-20">
-            <div className="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent text-primary-600 rounded-full" aria-hidden="true"></div>
+            <div className="animate-spin inline-block w-10 h-10 border-4 border-current border-t-transparent text-primary-600 rounded-full" aria-hidden="true"></div>
             <p className="mt-4 text-lg text-gray-600">Loading career paths...</p>
           </div>
         ) : filteredCareers.length === 0 ? (
-          <div className="text-center py-20 bg-white rounded-lg shadow-sm">
-            <p className="text-lg text-gray-600 mb-4">No career paths found matching your criteria.</p>
+          <div className="text-center py-20 bg-white rounded-xl shadow-sm">
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+              <Search className="h-10 w-10 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">No career paths found</h3>
+            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+              We couldn't find any career paths matching your criteria. Try adjusting your search or filters.
+            </p>
             <Button 
               onClick={() => {
                 setSearchTerm("");
-                setSelectedCategory("");
+                setSelectedCategory("all");
                 setFilteredCareers(careerPaths || []);
               }}
+              className="bg-primary-600 hover:bg-primary-700"
             >
               Reset Filters
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCareers.map((path) => (
-              <div 
-                key={path.id} 
-                className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition duration-300"
-              >
-                <div className={`h-36 ${path.iconColor} flex items-center justify-center text-white`}>
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    className="h-16 w-16" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor"
-                  >
-                    <path 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round" 
-                      strokeWidth="2" 
-                      d={path.icon} 
-                    />
-                  </svg>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-semibold text-gray-900">{path.title}</h3>
-                    <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                      {path.demandLevel}
-                    </span>
-                  </div>
-                  <p className="text-gray-600 mb-4">{path.description}</p>
-                  <div className="flex items-center text-sm text-gray-500 mb-4">
+          <>
+            <p className="text-gray-500 mb-4">Showing {filteredCareers.length} career paths</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredCareers.map((path) => (
+                <div 
+                  key={path.id} 
+                  className="group bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-300 flex flex-col"
+                >
+                  {/* Header with icon and gradient background */}
+                  <div className={`relative h-40 ${path.iconColor} bg-gradient-to-br from-${path.iconColor.split('-')[1]}-500 to-${path.iconColor.split('-')[1]}-600 flex items-center justify-center text-white p-6`}>
                     <svg 
                       xmlns="http://www.w3.org/2000/svg" 
-                      className="h-5 w-5 mr-1 text-gray-400" 
+                      className="h-20 w-20 opacity-90" 
                       fill="none" 
                       viewBox="0 0 24 24" 
                       stroke="currentColor"
@@ -196,26 +246,54 @@ const ExploreCareer = () => {
                       <path 
                         strokeLinecap="round" 
                         strokeLinejoin="round" 
-                        strokeWidth="2" 
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" 
+                        strokeWidth="1.5" 
+                        d={path.icon} 
                       />
                     </svg>
-                    <span>{path.educationYears}</span>
+                    <div className="absolute top-3 right-3">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getDemandColor(path.demandLevel)}`}>
+                        {path.demandLevel}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-primary-600 font-medium text-sm">
-                      Average Salary: {path.salaryRange}
-                    </span>
-                    <Link href={`/career/${path.id}`}>
-                      <Button variant="link" className="text-primary-600 hover:text-primary-800">
-                        View Details
-                      </Button>
-                    </Link>
+                  
+                  {/* Content section */}
+                  <div className="p-6 flex-grow flex flex-col">
+                    <div className="mb-4">
+                      <Badge variant="outline" className="text-xs mb-2 text-gray-500 bg-gray-50">
+                        {path.category}
+                      </Badge>
+                      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">{path.title}</h3>
+                    </div>
+                    
+                    <p className="text-gray-600 mb-6 flex-grow line-clamp-3">{path.description}</p>
+                    
+                    {/* Career details */}
+                    <div className="space-y-3 mb-6">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <DollarSign className="h-4 w-4 mr-2 text-primary-500" />
+                        <span>{path.salaryRange}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Clock className="h-4 w-4 mr-2 text-primary-500" />
+                        <span>{path.educationYears}</span>
+                      </div>
+                    </div>
+                    
+                    {/* CTA Button */}
+                    <div className="mt-auto">
+                      <Link href={`/career/${path.id}`}>
+                        <Button className="w-full transition-all duration-300 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-700 hover:to-primary-600 text-white group">
+                          Explore Career Path
+                          <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </main>
