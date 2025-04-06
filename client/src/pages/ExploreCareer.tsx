@@ -81,7 +81,7 @@ const ExploreCareer = () => {
 
   const handleSearch = async () => {
     if (searchTerm.trim() === "") {
-      if (selectedCategory) {
+      if (selectedCategory && selectedCategory !== "all") {
         // Just filter by the selected category
         await handleCategoryChange(selectedCategory);
       } else {
@@ -92,10 +92,12 @@ const ExploreCareer = () => {
     }
     
     try {
+      console.log("Searching for:", searchTerm);
       const results = await searchCareerPaths(searchTerm);
+      console.log("Search results:", results);
       
-      // If we also have a category selected, further filter the results
-      if (selectedCategory) {
+      // If we also have a category selected and it's not "all", further filter the results
+      if (selectedCategory && selectedCategory !== "all") {
         const filtered = results.filter(
           career => career.category.toLowerCase() === selectedCategory.toLowerCase()
         );
@@ -105,6 +107,24 @@ const ExploreCareer = () => {
       }
     } catch (error) {
       console.error("Error searching career paths:", error);
+      // Fallback to client-side filtering if API call fails
+      if (careerPaths) {
+        const lowerQuery = searchTerm.toLowerCase();
+        const results = careerPaths.filter(
+          (path) => 
+            path.title.toLowerCase().includes(lowerQuery) || 
+            path.description.toLowerCase().includes(lowerQuery)
+        );
+        
+        if (selectedCategory && selectedCategory !== "all") {
+          const filtered = results.filter(
+            career => career.category.toLowerCase() === selectedCategory.toLowerCase()
+          );
+          setFilteredCareers(filtered);
+        } else {
+          setFilteredCareers(results);
+        }
+      }
     }
   };
 
