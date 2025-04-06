@@ -36,8 +36,9 @@ import { Badge } from "@/components/ui/badge";
 import ResumeForm from "@/components/resume/ResumeForm";
 import ResumePreview from "@/components/resume/ResumePreview";
 import ResumeTemplates from "@/components/resume/ResumeTemplates";
+import SampleResumeViewer from "@/components/resume/SampleResumeViewer";
 import { companyPreferences, getCompanyPreferences, resumeTips } from "@/data/companyPreferences";
-import { sampleResumes } from "@/data/sampleResumes";
+import { sampleResumes, SampleResume } from "@/data/sampleResumes";
 import { generateResumeContent } from "@/utils/generateResumeContent";
 
 export type ResumeData = {
@@ -170,6 +171,7 @@ const ResumeBuilder = () => {
   const [companyPreference, setCompanyPreference] = useState<any>(null);
   const [showSampleResumes, setShowSampleResumes] = useState(false);
   const [activeSampleResume, setActiveSampleResume] = useState<string | null>(null);
+  const [selectedResumeForViewing, setSelectedResumeForViewing] = useState<SampleResume | null>(null);
   const [resumeData, setResumeData] = useState<ResumeData>({
     personalInfo: {
       name: "",
@@ -391,11 +393,17 @@ const ResumeBuilder = () => {
       setActiveSampleResume(id);
     }
   };
+  
+  // View detailed sample resume
+  const viewSampleResume = (resume: SampleResume) => {
+    setSelectedResumeForViewing(resume);
+  };
 
   return (
-    <main className="min-h-screen py-8 bg-gradient-to-b from-gray-50 to-[#f8f5f0]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Page Header */}
+    <>
+      <main className="min-h-screen py-8 bg-gradient-to-b from-gray-50 to-[#f8f5f0]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Page Header */}
         <div className="flex flex-col items-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-purple-700">
             OwlPath Resume Builder
@@ -619,6 +627,23 @@ const ResumeBuilder = () => {
                             </li>
                           ))}
                         </ul>
+                        
+                        {resume.resumeContent && (
+                          <div className="mt-4 flex justify-end">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="text-sm border-primary-200 text-primary-700 hover:bg-primary-50 flex items-center"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                viewSampleResume(resume);
+                              }}
+                            >
+                              <FileText className="h-4 w-4 mr-1" />
+                              View Full Resume
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -907,6 +932,15 @@ const ResumeBuilder = () => {
         </div>
       </div>
     </main>
+      
+      {/* Sample Resume Viewer Modal */}
+      {selectedResumeForViewing && (
+        <SampleResumeViewer
+          sampleResume={selectedResumeForViewing}
+          onClose={() => setSelectedResumeForViewing(null)}
+        />
+      )}
+    </>
   );
 };
 
