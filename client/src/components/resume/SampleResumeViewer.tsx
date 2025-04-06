@@ -39,22 +39,34 @@ const SampleResumeViewer = ({ sampleResume, onClose }: SampleResumeViewerProps) 
   
   if (!resumeContent) {
     return (
-      <div className="p-6 text-center">
-        <p className="text-gray-500">Detailed resume content not available.</p>
-        <Button onClick={onClose} className="mt-4">Close</Button>
-      </div>
+      <Dialog open={true} onOpenChange={() => onClose()}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Sample Resume</DialogTitle>
+            <DialogDescription>
+              Detailed resume content not available.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="text-center">
+            <Button onClick={onClose} className="mt-4">Close</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     );
   }
 
   return (
-    <div className="max-h-[80vh] overflow-y-auto">
-      <div className="sticky top-0 bg-white z-10 py-3 px-4 border-b flex justify-between items-center">
-        <div>
-          <h3 className="text-lg font-bold text-gray-900">Sample Resume: {sampleResume.company}</h3>
-          <p className="text-sm text-gray-500">{sampleResume.role} • {sampleResume.result}</p>
-        </div>
-        <Button variant="ghost" size="sm" onClick={onClose}>Close</Button>
-      </div>
+    <Dialog open={true} onOpenChange={() => onClose()}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="py-2 border-b">
+          <DialogTitle>Sample Resume: {sampleResume.company}</DialogTitle>
+          <DialogDescription className="text-sm">
+            {sampleResume.role} • {sampleResume.result}
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="flex-1 overflow-y-auto pr-1">
+        
       
       <div className="p-6 bg-gray-50">
         {/* Resume Header */}
