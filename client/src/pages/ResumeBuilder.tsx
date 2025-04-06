@@ -501,125 +501,7 @@ const ResumeBuilder = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left column - Editor and AI Generator */}
           <div className="lg:w-3/5">
-            {/* Resume Editor */}
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
-              <div className="border-b border-gray-100 p-4 flex justify-between items-center">
-                <h3 className="text-lg font-semibold flex items-center">
-                  <Pencil className="h-5 w-5 text-primary-600 mr-2" />
-                  Resume Content
-                </h3>
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setActiveTab("templates")}
-                  >
-                    Templates
-                  </Button>
-                  <Button 
-                    size="sm"
-                    onClick={() => setActiveTab("preview")}
-                    className="bg-primary-600 hover:bg-primary-700"
-                  >
-                    Preview
-                  </Button>
-                </div>
-              </div>
-              
-              <div className="p-6">
-                <ResumeForm 
-                  resumeData={resumeData} 
-                  setResumeData={setResumeData} 
-                />
-              </div>
-            </div>
-
-            {/* Smart Resume Generator (AI) */}
-            <div className="bg-gradient-to-r from-primary-600 to-primary-500 rounded-xl shadow-sm p-6 text-white mb-8">
-              <div className="flex items-start">
-                <div className="mr-4 mt-1">
-                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-2">
-                    <Sparkles className="h-5 w-5" />
-                  </div>
-                </div>
-                <div className="flex-grow">
-                  <h3 className="text-xl font-semibold mb-2">AI Resume Enhancement</h3>
-                  
-                  {resumeIntent.type === 'company' && companyPreference ? (
-                    <p className="text-white/90 mb-4">
-                      Optimize your resume specifically for <span className="font-bold">{companyPreference.name}</span>. 
-                      Our AI will tailor your content to match their preferences and hiring patterns.
-                    </p>
-                  ) : (
-                    <p className="text-white/90 mb-4">
-                      Let our AI analyze and enhance your resume content for your selected resume type, 
-                      highlighting your most relevant qualifications.
-                    </p>
-                  )}
-                  
-                  <ul className="space-y-2 mb-6">
-                    <li className="flex items-start">
-                      <span className="bg-white/20 rounded-full p-1 mr-2 mt-0.5">
-                        <Check className="h-3 w-3" />
-                      </span>
-                      <span className="text-sm">
-                        {resumeIntent.type === 'company' && companyPreference
-                          ? `Align with ${companyPreference.name}'s preferred keywords and values`
-                          : "Professionally rewrite your summary and descriptions"}
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="bg-white/20 rounded-full p-1 mr-2 mt-0.5">
-                        <Check className="h-3 w-3" />
-                      </span>
-                      <span className="text-sm">
-                        {resumeIntent.type === 'company' && companyPreference
-                          ? `Emphasize skills and experiences ${companyPreference.name} values most`
-                          : "Highlight relevant skills for your chosen career path"}
-                      </span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="bg-white/20 rounded-full p-1 mr-2 mt-0.5">
-                        <Check className="h-3 w-3" />
-                      </span>
-                      <span className="text-sm">
-                        {resumeIntent.type === 'company' && companyPreference
-                          ? `Structure content based on ${companyPreference.name}'s preferred format`
-                          : "Adapt content tone for your selected resume type"}
-                      </span>
-                    </li>
-                  </ul>
-                  <Button 
-                    className="bg-white text-primary-600 hover:bg-white/90"
-                    onClick={handleGenerateWithAI}
-                    disabled={isAiGenerating}
-                  >
-                    {isAiGenerating ? (
-                      <>
-                        <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2"></div>
-                        {resumeIntent.type === 'company' && companyPreference
-                          ? `Optimizing for ${companyPreference.name}...`
-                          : "Enhancing Resume..."}
-                      </>
-                    ) : (
-                      <>
-                        {resumeIntent.type === 'company' && companyPreference
-                          ? `Optimize for ${companyPreference.name}`
-                          : "Generate with AI"}
-                      </>
-                    )}
-                  </Button>
-                  <div className="mt-4 flex items-center">
-                    <span className="mr-2 text-xs opacity-75">Powered by OpenAI</span>
-                    <Badge className="bg-white/20 text-white text-xs hover:bg-white/30">
-                      Beta Feature
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Resume Tips Section */}
+            {/* Resume Tips Section - Moved to top after intent selection */}
             <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
               <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-900">
                 <Lightbulb className="h-5 w-5 text-amber-500 mr-2" />
@@ -632,7 +514,7 @@ const ResumeBuilder = () => {
               </h3>
               
               <ul className="space-y-3 pl-2">
-                {getTips().map((tip, index) => (
+                {getTips().map((tip: string, index: number) => (
                   <li key={index} className="flex items-start">
                     <span className="bg-amber-100 text-amber-800 rounded-full p-0.5 mr-2 mt-1">
                       <Check className="h-3.5 w-3.5" />
@@ -679,77 +561,193 @@ const ResumeBuilder = () => {
               )}
             </div>
             
-            {/* Sample Resumes Section */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            {/* Sample Resumes Section - Moved up right after tips as requested */}
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold flex items-center text-gray-900">
                   <BookOpen className="h-5 w-5 text-emerald-500 mr-2" />
-                  Sample Resumes
+                  Previously Accepted Resumes
                   {resumeIntent.type === 'company' && companyPreference && (
                     <Badge className="ml-2 bg-indigo-100 text-indigo-800 border-indigo-200">
-                      For {companyPreference.name}
+                      From {companyPreference.name}
                     </Badge>
                   )}
                 </h3>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setShowSampleResumes(!showSampleResumes)}
-                >
-                  {showSampleResumes ? "Hide Samples" : "Show Samples"}
-                </Button>
               </div>
               
-              {showSampleResumes && (
-                <div className="space-y-4">
-                  {getSampleResumes().map(resume => (
+              {/* Always show samples by default */}
+              <div className="space-y-4">
+                {getSampleResumes().map((resume) => (
+                  <div 
+                    key={resume.id} 
+                    className="border border-gray-200 rounded-lg overflow-hidden"
+                  >
                     <div 
-                      key={resume.id} 
-                      className="border border-gray-200 rounded-lg overflow-hidden"
+                      className="p-4 bg-gray-50 flex justify-between items-center cursor-pointer"
+                      onClick={() => toggleSampleResume(resume.id)}
                     >
-                      <div 
-                        className="p-4 bg-gray-50 flex justify-between items-center cursor-pointer"
-                        onClick={() => toggleSampleResume(resume.id)}
-                      >
-                        <div>
-                          <div className="flex items-center">
-                            <span className="font-medium text-gray-900">{resume.role}</span>
-                            <Badge className="ml-2 bg-green-100 text-green-800 border-green-200">
-                              {resume.result}
-                            </Badge>
-                          </div>
-                          <div className="text-sm text-gray-500">{resume.company}</div>
+                      <div>
+                        <div className="flex items-center">
+                          <span className="font-medium text-gray-900">{resume.role}</span>
+                          <Badge className="ml-2 bg-green-100 text-green-800 border-green-200">
+                            {resume.result}
+                          </Badge>
                         </div>
-                        <div className="flex items-center text-gray-400">
-                          {activeSampleResume === resume.id ? "Hide" : "View"} 
-                          <svg 
-                            className={`h-5 w-5 ml-1 transition-transform ${activeSampleResume === resume.id ? 'rotate-180' : ''}`} 
-                            fill="none" 
-                            viewBox="0 0 24 24" 
-                            stroke="currentColor"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </div>
+                        <div className="text-sm text-gray-500">{resume.company}</div>
                       </div>
-                      
-                      {activeSampleResume === resume.id && (
-                        <div className="p-4 border-t border-gray-200">
-                          <h4 className="font-medium text-gray-900 mb-2">Key Resume Highlights:</h4>
-                          <ul className="space-y-2 ml-2">
-                            {resume.highlights.map((highlight, index) => (
-                              <li key={index} className="flex items-start">
-                                <Star className="h-4 w-4 text-amber-500 mr-2 mt-0.5" />
-                                <span className="text-sm text-gray-700">{highlight}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                      <div className="flex items-center text-gray-400">
+                        {activeSampleResume === resume.id ? "Hide" : "View"} 
+                        <svg 
+                          className={`h-5 w-5 ml-1 transition-transform ${activeSampleResume === resume.id ? 'rotate-180' : ''}`} 
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
                     </div>
-                  ))}
+                    
+                    {activeSampleResume === resume.id && (
+                      <div className="p-4 border-t border-gray-200">
+                        <h4 className="font-medium text-gray-900 mb-2">Key Resume Highlights:</h4>
+                        <ul className="space-y-2 ml-2">
+                          {resume.highlights.map((highlight: string, index: number) => (
+                            <li key={index} className="flex items-start">
+                              <Star className="h-4 w-4 text-amber-500 mr-2 mt-0.5" />
+                              <span className="text-sm text-gray-700">{highlight}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Resume Creation Options */}
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+              <h3 className="text-lg font-semibold mb-5 flex items-center text-gray-900">
+                <FileStack className="h-5 w-5 text-primary-600 mr-2" />
+                Resume Creation Options
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Option 1: AI-Generated Resume */}
+                <div className="border border-gray-200 rounded-lg p-5 hover:border-primary-300 hover:shadow-sm transition-all cursor-pointer">
+                  <div className="flex justify-center mb-3">
+                    <div className="bg-gradient-to-r from-primary-100 to-primary-50 rounded-full p-3">
+                      <Sparkles className="h-6 w-6 text-primary-600" />
+                    </div>
+                  </div>
+                  <h4 className="font-semibold text-gray-900 text-center mb-2">AI-Generated</h4>
+                  <p className="text-sm text-gray-600 text-center mb-4">
+                    Let AI create your entire resume with minimal input from you
+                  </p>
+                  <Button 
+                    className="w-full bg-primary-600 hover:bg-primary-700"
+                    onClick={handleGenerateWithAI}
+                    disabled={isAiGenerating}
+                  >
+                    {isAiGenerating ? (
+                      <>
+                        <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2"></div>
+                        Generating...
+                      </>
+                    ) : (
+                      <>Create AI Resume</>
+                    )}
+                  </Button>
+                  <div className="mt-3">
+                    <p className="text-xs text-gray-500 text-center">Best for: Quick creation with professional results</p>
+                  </div>
                 </div>
-              )}
+                
+                {/* Option 2: Enhanced Resume */}
+                <div className="border border-gray-200 rounded-lg p-5 hover:border-primary-300 hover:shadow-sm transition-all cursor-pointer">
+                  <div className="flex justify-center mb-3">
+                    <div className="bg-gradient-to-r from-emerald-100 to-emerald-50 rounded-full p-3">
+                      <PenTool className="h-6 w-6 text-emerald-600" />
+                    </div>
+                  </div>
+                  <h4 className="font-semibold text-gray-900 text-center mb-2">AI-Enhanced</h4>
+                  <p className="text-sm text-gray-600 text-center mb-4">
+                    Create your resume first, then enhance with AI suggestions
+                  </p>
+                  <Button 
+                    variant="outline"
+                    className="w-full border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                    onClick={() => {
+                      // First navigate to the form, then later enhance
+                      setActiveTab("create");
+                    }}
+                  >
+                    Start With This Option
+                  </Button>
+                  <div className="mt-3">
+                    <p className="text-xs text-gray-500 text-center">Best for: Balance of personalization and optimization</p>
+                  </div>
+                </div>
+                
+                {/* Option 3: User-Made Resume */}
+                <div className="border border-gray-200 rounded-lg p-5 hover:border-primary-300 hover:shadow-sm transition-all cursor-pointer">
+                  <div className="flex justify-center mb-3">
+                    <div className="bg-gradient-to-r from-amber-100 to-amber-50 rounded-full p-3">
+                      <Pencil className="h-6 w-6 text-amber-600" />
+                    </div>
+                  </div>
+                  <h4 className="font-semibold text-gray-900 text-center mb-2">Step-by-Step</h4>
+                  <p className="text-sm text-gray-600 text-center mb-4">
+                    Build your resume manually with guidance from templates
+                  </p>
+                  <Button 
+                    variant="outline"
+                    className="w-full border-amber-200 text-amber-700 hover:bg-amber-50"
+                    onClick={() => {
+                      setActiveTab("create");
+                    }}
+                  >
+                    Create From Scratch
+                  </Button>
+                  <div className="mt-3">
+                    <p className="text-xs text-gray-500 text-center">Best for: Maximum control over your content</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Resume Editor - Moved down as requested */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
+              <div className="border-b border-gray-100 p-4 flex justify-between items-center">
+                <h3 className="text-lg font-semibold flex items-center">
+                  <Pencil className="h-5 w-5 text-primary-600 mr-2" />
+                  Resume Content
+                </h3>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setActiveTab("templates")}
+                  >
+                    Templates
+                  </Button>
+                  <Button 
+                    size="sm"
+                    onClick={() => setActiveTab("preview")}
+                    className="bg-primary-600 hover:bg-primary-700"
+                  >
+                    Preview
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="p-6">
+                <ResumeForm 
+                  resumeData={resumeData} 
+                  setResumeData={setResumeData} 
+                />
+              </div>
             </div>
           </div>
           
