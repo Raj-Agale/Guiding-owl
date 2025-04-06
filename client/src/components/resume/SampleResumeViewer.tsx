@@ -1,282 +1,144 @@
 import { useState } from "react";
 import { SampleResume } from "@/data/sampleResumes";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogClose
+  DialogDescription,
+  DialogFooter
 } from "@/components/ui/dialog";
 import {
-  Briefcase,
-  GraduationCap,
-  User,
-  Star,
-  Code,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  ChevronLeft,
-  ChevronRight,
-  CheckCircle2,
-  Award,
-  FileText
+  ExternalLink,
+  Download,
+  FileText,
+  Loader2,
+  CheckCircle2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 
 interface SampleResumeViewerProps {
   sampleResume: SampleResume;
   onClose: () => void;
 }
 
-const SampleResumeViewer = ({ sampleResume, onClose }: SampleResumeViewerProps) => {
-  const { resumeContent } = sampleResume;
-  
-  if (!resumeContent) {
-    return (
-      <Dialog open={true} onOpenChange={() => onClose()}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Sample Resume</DialogTitle>
-            <DialogDescription>
-              Detailed resume content not available.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="text-center">
-            <Button onClick={onClose} className="mt-4">Close</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
+const RESUME_URLS = {
+  "Google": "https://resumegenius.com/wp-content/uploads/Software-Engineer-Resume-Example-Google.png",
+  "Microsoft": "https://enhancv.com/static/e57b34c26cc4f3aeec3afa5c181e35dd/resume-examples-microsoft.webp",
+  "Amazon": "https://cdn.enhancv.com/sample-amazon-software-engineer-resume.png",
+  "Apple": "https://cdn.enhancv.com/enhancv-sample-software-engineer-resume.png",
+  "Stanford": "https://cdn.resumebuilder.com/wp-content/uploads/College-Resume-Template-College-Student-Resume.png",
+  "Harvard": "https://cdn.resumekit.com/uploads/resume_samples/136/College_Student_Resume.png",
+  "MIT": "https://cdn.theladders.net/wp-content/uploads/college-student-resume-example-2.jpg"
+};
 
+const SampleResumeViewer = ({ sampleResume, onClose }: SampleResumeViewerProps) => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  
+  // Determine resume URL based on company
+  const getResumeUrl = () => {
+    const company = sampleResume.company;
+    return RESUME_URLS[company] || null;
+  };
+
+  const resumeUrl = getResumeUrl();
+  
+  const handleImageLoad = () => {
+    setLoading(false);
+  };
+  
+  const handleImageError = () => {
+    setLoading(false);
+    setError(true);
+  };
+  
   return (
     <Dialog open={true} onOpenChange={() => onClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader className="py-2 border-b">
+      <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col">
+        <DialogHeader>
           <DialogTitle>Sample Resume: {sampleResume.company}</DialogTitle>
-          <DialogDescription className="text-sm">
-            {sampleResume.role} • {sampleResume.result}
+          <DialogDescription>
+            {sampleResume.role} • <span className="text-green-600 font-medium">{sampleResume.result}</span>
           </DialogDescription>
         </DialogHeader>
         
-        <div className="flex-1 overflow-y-auto pr-1">
-        
-      
-      <div className="p-6 bg-gray-50">
-        {/* Resume Header */}
-        <div className="bg-white border rounded-md shadow-sm mb-6 p-6">
-          <h1 className="text-2xl font-bold text-gray-900">{resumeContent.personalInfo.name}</h1>
-          <p className="text-lg text-gray-700 mt-1">{resumeContent.personalInfo.title}</p>
-          
-          <div className="mt-4 flex flex-wrap gap-3 text-sm text-gray-600">
-            {resumeContent.personalInfo.email && (
-              <div className="flex items-center gap-1.5">
-                <Mail className="h-4 w-4 text-primary-500" />
-                <span>{resumeContent.personalInfo.email}</span>
-              </div>
-            )}
-            {resumeContent.personalInfo.phone && (
-              <div className="flex items-center gap-1.5">
-                <Phone className="h-4 w-4 text-primary-500" />
-                <span>{resumeContent.personalInfo.phone}</span>
-              </div>
-            )}
-            {resumeContent.personalInfo.location && (
-              <div className="flex items-center gap-1.5">
-                <MapPin className="h-4 w-4 text-primary-500" />
-                <span>{resumeContent.personalInfo.location}</span>
-              </div>
-            )}
-          </div>
-          
-          {resumeContent.personalInfo.summary && (
-            <div className="mt-4">
-              <p className="text-gray-700">{resumeContent.personalInfo.summary}</p>
+        <div className="flex-1 overflow-y-auto my-4 flex flex-col">
+          {resumeUrl ? (
+            <div className="relative h-full min-h-[400px] bg-gray-50 rounded-md flex items-center justify-center">
+              {loading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-50 z-10">
+                  <Loader2 className="h-8 w-8 text-primary-500 animate-spin" />
+                  <span className="ml-2 text-gray-500">Loading sample resume...</span>
+                </div>
+              )}
+              
+              <img 
+                src={resumeUrl} 
+                alt={`${sampleResume.company} ${sampleResume.role} Resume`}
+                className="max-w-full h-auto object-contain rounded shadow-sm"
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+                style={{ display: loading ? 'none' : 'block' }}
+              />
+              
+              {error && (
+                <div className="text-center p-6">
+                  <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-700 mb-2">Resume preview unavailable</h3>
+                  <p className="text-gray-500 mb-4">
+                    We couldn't load the sample resume preview for {sampleResume.company}.
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center p-6 bg-gray-50 rounded-md">
+              <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-700 mb-2">No resume preview available</h3>
+              <p className="text-gray-500 mb-4">
+                We don't have a sample resume for {sampleResume.company} yet.
+              </p>
             </div>
           )}
-        </div>
-        
-        {/* Resume Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Left Column */}
-          <div className="md:col-span-2 space-y-6">
-            {/* Experience Section */}
-            {resumeContent.experience && resumeContent.experience.length > 0 && (
-              <section className="bg-white border rounded-md shadow-sm p-5">
-                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                  <Briefcase className="h-5 w-5 text-primary-500 mr-2" />
-                  Experience
-                </h2>
-                
-                <div className="space-y-5">
-                  {resumeContent.experience.map((exp, index) => (
-                    <div key={index} className="border-l-2 border-gray-200 pl-4 hover:border-primary-500 transition-colors">
-                      <div className="flex flex-col md:flex-row md:justify-between md:items-start">
-                        <div>
-                          <h3 className="font-semibold text-gray-900">{exp.position}</h3>
-                          <p className="text-gray-700">{exp.company}</p>
-                        </div>
-                        <div className="text-sm text-gray-600 md:text-right flex items-center gap-1.5 mt-1 md:mt-0">
-                          <Calendar className="h-3.5 w-3.5" />
-                          <span>{exp.dates}</span>
-                        </div>
-                      </div>
-                      
-                      {exp.description && (
-                        <p className="mt-2 text-gray-700">{exp.description}</p>
-                      )}
-                      
-                      {exp.highlights && exp.highlights.length > 0 && (
-                        <ul className="mt-2 space-y-1 text-gray-700">
-                          {exp.highlights.map((highlight, i) => (
-                            <li key={i} className="flex items-start">
-                              <CheckCircle2 className="h-4 w-4 text-primary-500 mr-2 flex-shrink-0 mt-0.5" />
-                              <span>{highlight}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-            
-            {/* Projects Section */}
-            {resumeContent.projects && resumeContent.projects.length > 0 && (
-              <section className="bg-white border rounded-md shadow-sm p-5">
-                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                  <Code className="h-5 w-5 text-primary-500 mr-2" />
-                  Projects
-                </h2>
-                
-                <div className="space-y-5">
-                  {resumeContent.projects.map((project, index) => (
-                    <div key={index} className="border-l-2 border-gray-200 pl-4 hover:border-primary-500 transition-colors">
-                      <h3 className="font-semibold text-gray-900">{project.name}</h3>
-                      
-                      {project.description && (
-                        <p className="mt-1 text-gray-700">{project.description}</p>
-                      )}
-                      
-                      {project.highlights && project.highlights.length > 0 && (
-                        <ul className="mt-2 space-y-1 text-gray-700">
-                          {project.highlights.map((highlight, i) => (
-                            <li key={i} className="flex items-start">
-                              <CheckCircle2 className="h-4 w-4 text-primary-500 mr-2 flex-shrink-0 mt-0.5" />
-                              <span>{highlight}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
-          </div>
           
-          {/* Right Column */}
-          <div className="space-y-6">
-            {/* Education Section */}
-            {resumeContent.education && resumeContent.education.length > 0 && (
-              <section className="bg-white border rounded-md shadow-sm p-5">
-                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                  <GraduationCap className="h-5 w-5 text-primary-500 mr-2" />
-                  Education
-                </h2>
-                
-                <div className="space-y-4">
-                  {resumeContent.education.map((edu, index) => (
-                    <div key={index}>
-                      <h3 className="font-semibold text-gray-900">{edu.degree}</h3>
-                      <p className="text-gray-700">{edu.institution}</p>
-                      <p className="text-sm text-gray-600 mt-1 flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5" />
-                        <span>{edu.dates}</span>
-                      </p>
-                      {edu.field && <p className="text-gray-700 mt-1">{edu.field}</p>}
-                      {edu.gpa && <p className="text-gray-700 mt-1">GPA: {edu.gpa}</p>}
-                      
-                      {edu.achievements && edu.achievements.length > 0 && (
-                        <ul className="mt-2 space-y-1 text-gray-700">
-                          {edu.achievements.map((achievement, i) => (
-                            <li key={i} className="flex items-start">
-                              <CheckCircle2 className="h-4 w-4 text-primary-500 mr-2 flex-shrink-0 mt-0.5" />
-                              <span>{achievement}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+          {/* What Made This Resume Successful */}
+          <div className="mt-6 bg-primary-50 border border-primary-100 rounded-md p-5">
+            <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
+              <FileText className="h-5 w-5 text-primary-600 mr-2" />
+              Why This Resume Was Successful
+            </h2>
             
-            {/* Skills Section */}
-            {resumeContent.skills && resumeContent.skills.length > 0 && (
-              <section className="bg-white border rounded-md shadow-sm p-5">
-                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                  <Star className="h-5 w-5 text-primary-500 mr-2" />
-                  Skills
-                </h2>
-                
-                <div className="flex flex-wrap gap-2">
-                  {resumeContent.skills.map((skill, index) => (
-                    <Badge key={index} className="bg-primary-100 text-primary-800 border-primary-200 py-1">
-                      {skill}
-                    </Badge>
-                  ))}
-                </div>
-              </section>
-            )}
-            
-            {/* Achievements Section */}
-            {resumeContent.achievements && resumeContent.achievements.length > 0 && (
-              <section className="bg-white border rounded-md shadow-sm p-5">
-                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                  <Award className="h-5 w-5 text-primary-500 mr-2" />
-                  Achievements
-                </h2>
-                
-                <ul className="space-y-2 text-gray-700">
-                  {resumeContent.achievements.map((achievement, index) => (
-                    <li key={index} className="flex items-start">
-                      <CheckCircle2 className="h-4 w-4 text-primary-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <span>{achievement}</span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
+            <ul className="space-y-2">
+              {sampleResume.highlights.map((highlight, index) => (
+                <li key={index} className="flex items-start">
+                  <CheckCircle2 className="h-4 w-4 text-primary-600 mr-2 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-800">{highlight}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
         
-        {/* What Made This Resume Successful */}
-        <div className="mt-8 bg-primary-50 border border-primary-100 rounded-md p-5">
-          <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center">
-            <FileText className="h-5 w-5 text-primary-600 mr-2" />
-            Why This Resume Was Successful
-          </h2>
-          
-          <ul className="space-y-2">
-            {sampleResume.highlights.map((highlight, index) => (
-              <li key={index} className="flex items-start">
-                <CheckCircle2 className="h-4 w-4 text-primary-600 mr-2 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-800">{highlight}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </div>
+        <DialogFooter className="flex justify-between items-center border-t pt-4">
+          <div>
+            <Badge className="bg-green-100 text-green-800 border-green-200">
+              {sampleResume.result}
+            </Badge>
+          </div>
+          <div className="flex gap-2">
+            {resumeUrl && !error && (
+              <Button variant="outline" size="sm" onClick={() => window.open(resumeUrl, '_blank')}>
+                <ExternalLink className="h-4 w-4 mr-1.5" />
+                View Full Size
+              </Button>
+            )}
+            <Button onClick={onClose}>Close</Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
