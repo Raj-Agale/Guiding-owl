@@ -23,14 +23,16 @@ interface SampleResumeViewerProps {
   onClose: () => void;
 }
 
-const RESUME_URLS = {
-  "Google": "https://resumegenius.com/wp-content/uploads/Software-Engineer-Resume-Example-Google.png",
-  "Microsoft": "https://enhancv.com/static/e57b34c26cc4f3aeec3afa5c181e35dd/resume-examples-microsoft.webp",
-  "Amazon": "https://cdn.enhancv.com/sample-amazon-software-engineer-resume.png",
-  "Apple": "https://cdn.enhancv.com/enhancv-sample-software-engineer-resume.png",
-  "Stanford": "https://cdn.resumebuilder.com/wp-content/uploads/College-Resume-Template-College-Student-Resume.png",
-  "Harvard": "https://cdn.resumekit.com/uploads/resume_samples/136/College_Student_Resume.png",
-  "MIT": "https://cdn.theladders.net/wp-content/uploads/college-student-resume-example-2.jpg"
+const RESUME_URLS: Record<string, string> = {
+  "Google": "https://www.livecareer.com/wp-content/uploads/2021/03/Software-Engineer-Resume-Example-Google.jpg",
+  "Microsoft": "https://www.livecareer.com/wp-content/uploads/2021/03/software-engineer-resume-example-Microsoft.jpg",
+  "Amazon": "https://www.kickresume.com/img/facebook/en/software-developer-resume-example.jpg",
+  "Apple": "https://cdn.buttercms.com/JbZv3BVhT8Owgbh4SK0j",
+  "Stanford": "https://www.livecareer.com/wp-content/uploads/2021/03/College-Student-Resume-Example-Stanford.jpg",
+  "Harvard": "https://www.kickresume.com/img/resume-samples/student-main-image@2x.png",
+  "MIT": "https://assets.kickresume.com/app/uploads/2023/04/07/student-sample-1.webp",
+  "Oxford": "https://www.kickresume.com/img/facebook/en/student-resume-example.jpg",
+  "Berkeley": "https://cdn.zety.com/images/zety-college-student-resume-example-1.jpg"
 };
 
 const SampleResumeViewer = ({ sampleResume, onClose }: SampleResumeViewerProps) => {
