@@ -509,67 +509,7 @@ const ResumeBuilder = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left column - Editor and AI Generator */}
           <div className="lg:w-3/5">
-            {/* Resume Tips Section - Moved to top after intent selection */}
-            <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-              <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-900">
-                <Lightbulb className="h-5 w-5 text-amber-500 mr-2" />
-                Resume Tips
-                {resumeIntent.type === 'company' && companyPreference && (
-                  <Badge className="ml-2 bg-indigo-100 text-indigo-800 border-indigo-200">
-                    {companyPreference.name} Specific
-                  </Badge>
-                )}
-              </h3>
-              
-              <ul className="space-y-3 pl-2">
-                {getTips().map((tip: string, index: number) => (
-                  <li key={index} className="flex items-start">
-                    <span className="bg-amber-100 text-amber-800 rounded-full p-0.5 mr-2 mt-1">
-                      <Check className="h-3.5 w-3.5" />
-                    </span>
-                    <span className="text-gray-700">{tip}</span>
-                  </li>
-                ))}
-              </ul>
-              
-              {/* Extra context for company specific resume */}
-              {resumeIntent.type === 'company' && companyPreference && (
-                <div className="mt-6 bg-indigo-50 rounded-lg p-4">
-                  <div className="flex items-start">
-                    <Info className="h-5 w-5 text-indigo-600 mr-2 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-medium text-indigo-900 mb-1">About {companyPreference.name}</h4>
-                      <p className="text-sm text-indigo-800 mb-2">
-                        Industry: {companyPreference.industry}
-                      </p>
-                      <div className="mb-2">
-                        <span className="text-xs font-medium text-indigo-900 block mb-1.5">Resume Format Preferences:</span>
-                        <div className="flex flex-wrap gap-1.5">
-                          <Badge variant="outline" className="bg-white/80 text-xs">
-                            {companyPreference.resumePreferences.format}
-                          </Badge>
-                          <Badge variant="outline" className="bg-white/80 text-xs">
-                            {companyPreference.resumePreferences.tone} tone
-                          </Badge>
-                        </div>
-                      </div>
-                      <div>
-                        <span className="text-xs font-medium text-indigo-900 block mb-1.5">Key Focus Areas:</span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {companyPreference.resumePreferences.emphasisOn.map((emphasis: string, i: number) => (
-                            <Badge key={i} variant="outline" className="bg-white/80 text-xs">
-                              {emphasis}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            {/* Sample Resumes Section - Moved up right after tips as requested */}
+            {/* Sample Resumes Section - Moved to the very top of content as requested */}
             <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold flex items-center text-gray-900">
@@ -649,6 +589,66 @@ const ResumeBuilder = () => {
                   </div>
                 ))}
               </div>
+            </div>
+            
+            {/* Resume Tips Section */}
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+              <h3 className="text-lg font-semibold mb-4 flex items-center text-gray-900">
+                <Lightbulb className="h-5 w-5 text-amber-500 mr-2" />
+                Resume Tips
+                {resumeIntent.type === 'company' && companyPreference && (
+                  <Badge className="ml-2 bg-indigo-100 text-indigo-800 border-indigo-200">
+                    {companyPreference.name} Specific
+                  </Badge>
+                )}
+              </h3>
+              
+              <ul className="space-y-3 pl-2">
+                {getTips().map((tip: string, index: number) => (
+                  <li key={index} className="flex items-start">
+                    <span className="bg-amber-100 text-amber-800 rounded-full p-0.5 mr-2 mt-1">
+                      <Check className="h-3.5 w-3.5" />
+                    </span>
+                    <span className="text-gray-700">{tip}</span>
+                  </li>
+                ))}
+              </ul>
+              
+              {/* Extra context for company specific resume */}
+              {resumeIntent.type === 'company' && companyPreference && (
+                <div className="mt-6 bg-indigo-50 rounded-lg p-4">
+                  <div className="flex items-start">
+                    <Info className="h-5 w-5 text-indigo-600 mr-2 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h4 className="font-medium text-indigo-900 mb-1">About {companyPreference.name}</h4>
+                      <p className="text-sm text-indigo-800 mb-2">
+                        Industry: {companyPreference.industry}
+                      </p>
+                      <div className="mb-2">
+                        <span className="text-xs font-medium text-indigo-900 block mb-1.5">Resume Format Preferences:</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          <Badge variant="outline" className="bg-white/80 text-xs">
+                            {companyPreference.resumePreferences.format}
+                          </Badge>
+                          <Badge variant="outline" className="bg-white/80 text-xs">
+                            {companyPreference.resumePreferences.tone} tone
+                          </Badge>
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-xs font-medium text-indigo-900 block mb-1.5">Key Focus Areas:</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {companyPreference.resumePreferences.emphasisOn.map((emphasis: string, i: number) => (
+                            <Badge key={i} variant="outline" className="bg-white/80 text-xs">
+                              {emphasis}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
             {/* Resume Creation Options */}
