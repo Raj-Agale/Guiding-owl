@@ -23,16 +23,17 @@ interface SampleResumeViewerProps {
   onClose: () => void;
 }
 
+// Direct links to images on more permissive domains
 const RESUME_URLS: Record<string, string> = {
-  "Google": "https://www.livecareer.com/wp-content/uploads/2021/03/Software-Engineer-Resume-Example-Google.jpg",
-  "Microsoft": "https://www.livecareer.com/wp-content/uploads/2021/03/software-engineer-resume-example-Microsoft.jpg",
-  "Amazon": "https://www.kickresume.com/img/facebook/en/software-developer-resume-example.jpg",
-  "Apple": "https://cdn.buttercms.com/JbZv3BVhT8Owgbh4SK0j",
-  "Stanford": "https://www.livecareer.com/wp-content/uploads/2021/03/College-Student-Resume-Example-Stanford.jpg",
-  "Harvard": "https://www.kickresume.com/img/resume-samples/student-main-image@2x.png",
-  "MIT": "https://assets.kickresume.com/app/uploads/2023/04/07/student-sample-1.webp",
-  "Oxford": "https://www.kickresume.com/img/facebook/en/student-resume-example.jpg",
-  "Berkeley": "https://cdn.zety.com/images/zety-college-student-resume-example-1.jpg"
+  "Google": "https://i.imgur.com/6Yg8vhY.png",
+  "Microsoft": "https://i.imgur.com/oNbhpnv.jpg",
+  "Amazon": "https://i.imgur.com/8wCdoaT.jpg",
+  "Apple": "https://i.imgur.com/xMp2NVw.jpg",
+  "Stanford": "https://i.imgur.com/gzOdSyK.jpg",
+  "Harvard": "https://i.imgur.com/L7uRzTf.jpg",
+  "MIT": "https://i.imgur.com/U8hzqKt.jpg",
+  "Oxford": "https://i.imgur.com/ZVHqWYK.jpg",
+  "Berkeley": "https://i.imgur.com/Qwg5MZN.jpg"
 };
 
 const SampleResumeViewer = ({ sampleResume, onClose }: SampleResumeViewerProps) => {
