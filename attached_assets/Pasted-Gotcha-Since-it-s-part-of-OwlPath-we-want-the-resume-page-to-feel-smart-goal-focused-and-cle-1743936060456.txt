@@ -1,0 +1,71 @@
+Gotcha. Since it’s part of **OwlPath**, we want the resume page to feel smart, goal-focused, and clean—something between a traditional builder and a personalized generator.
+
+Here’s a quick concept for how the **Resume Page** can be structured:
+
+---
+
+### 🧠 OwlPath Resume Builder – Page Layout Idea
+
+#### **🧩 Section 1: User Info Summary (Top Banner)**
+- Pulls name, goal, and academic focus directly from user profile (auto-filled)
+- Example:  
+  `Aarav | Goal: Get into MIT (CS) | Focus: SAT + AI Projects`
+
+---
+
+#### **📄 Section 2: Resume Type Selector**
+- Buttons/toggles:  
+  - 🎓 *College Resume (for SAT/abroad apps)*  
+  - 💼 *Internship/Job Resume*  
+  - 📷 *Creative Resume (for photographers/designers)*  
+  - 🧑‍💻 *Tech Resume (for coders/projects)*
+
+This sets tone + layout + content style.
+
+---
+
+#### **✍️ Section 3: Editable Resume Form (Auto + Manual Mix)**
+- Each section can be pre-filled based on OwlPath data (editable):
+  1. **Contact Info**
+  2. **Education**
+  3. **Test Scores** (e.g. SAT, JEE)
+  4. **Skills**
+  5. **Projects** (auto-fetched from planner/goals if possible)
+  6. **Extracurriculars** (linked to planner)
+  7. **Certifications/Courses**
+  8. **Work Experience / Freelance** (optional)
+  9. **Achievements / Awards**
+  10. **About Me** (short AI-generated paragraph, editable)
+
+---
+
+#### **🤖 Section 4: Smart Resume Generator (AI)**  
+- Button: **“Generate using AI”**
+- It uses user’s goal, scores, and planner data to:
+  - Fill in missing content
+  - Rewrite content to sound professional
+  - Adapt tone for college vs. internship vs. job
+
+Example:  
+_"Built a voice assistant in Python using basic NLP"_  
+→ _"Developed a Python-based voice assistant, integrating custom NLP modules for task automation."_
+
+---
+
+#### **🧾 Section 5: Live Preview + Export**
+- Real-time preview of resume on the right (PDF layout style)
+- Export options:
+  - 📄 Download PDF
+  - 🔗 Get shareable link (optional)
+  - ☁️ Save to user profile
+
+---
+
+### ⚙️ Bonus Ideas (for future versions)
+- Resume “score” or AI feedback ("Too many buzzwords", "Add 1 more project")
+- Templates: Clean, Creative, Minimalist, Modern
+- Drag and drop to reorder sections
+
+---
+
+Want me to sketch this in code (React + Tailwind)? Or just help you decide which features to start with?
