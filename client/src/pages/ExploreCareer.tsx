@@ -11,7 +11,13 @@ import {
   DollarSign,
   Briefcase,
   ArrowRight,
-  BookOpen
+  BookOpen,
+  Globe,
+  Code,
+  Stethoscope,
+  TrendingUp,
+  LineChart,
+  Shield
 } from "lucide-react";
 import { 
   Select, 
