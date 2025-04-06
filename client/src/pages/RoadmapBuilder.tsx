@@ -24,8 +24,8 @@ const RoadmapBuilder = () => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const { data: careerPath } = useQuery({
-    queryKey: careerId ? [`/api/career-paths/${careerId}`] : null,
-    queryFn: () => getCareerPathById(careerId!),
+    queryKey: careerId ? [`/api/career-paths/${careerId}`] : ['/api/career-paths/none'],
+    queryFn: () => careerId ? getCareerPathById(careerId!) : Promise.resolve(null),
     enabled: !!careerId
   });
 

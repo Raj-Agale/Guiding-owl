@@ -337,23 +337,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Roadmap generator
   app.post("/api/generate-roadmap", async (req, res) => {
     try {
+      const optionsSchema = z.object({
+        education: z.string().optional(),
+        experience: z.string().optional(),
+        timeframe: z.enum(["short", "medium", "long"]).optional(),
+        budget: z.enum(["low", "medium", "high"]).optional(),
+        includeCertifications: z.boolean().optional(),
+        includeOnlineCourses: z.boolean().optional(),
+        includeMentorship: z.boolean().optional(),
+        includeNetworking: z.boolean().optional(),
+        detailLevel: z.number().min(1).max(5).optional(),
+      }).optional();
+
       const schema = z.object({
-        career: z.string(),
+        career: z.string().min(1),
         currentSkills: z.array(z.string()),
-        goals: z.string()
+        goals: z.string().min(1),
+        options: optionsSchema
       });
       
       const validationResult = schema.safeParse(req.body);
       if (!validationResult.success) {
-        return res.status(400).json({ message: "Invalid roadmap generation data", errors: validationResult.error.errors });
+        return res.status(400).json({ 
+          message: "Invalid roadmap generation data", 
+          errors: validationResult.error.errors 
+        });
       }
       
-      const { career, currentSkills, goals } = validationResult.data;
-      const roadmap = await generateRoadmap(career, currentSkills, goals);
+      const { career, currentSkills, goals, options } = validationResult.data;
+      
+      // Check if API key is available
+      if (!process.env.OPENAI_API_KEY) {
+        return res.status(400).json({ 
+          error: "OpenAI API key is missing. Please provide a valid API key.",
+          milestones: [{ 
+            title: "API Key Required", 
+            description: "An OpenAI API key is required to generate a roadmap. Please provide a valid API key." 
+          }],
+          skills: [],
+          timeline: [],
+          pricing: []
+        });
+      }
+      
+      const roadmap = await generateRoadmap(career, currentSkills, goals, options);
       
       res.json(roadmap);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to generate roadmap" });
+    } catch (error: any) {
+      console.error("Error in roadmap generation:", error);
+      let errorMessage = "Failed to generate roadmap";
+      
+      // Check for rate limit errors
+      if (error?.message?.includes("rate limit") || error?.message?.includes("quota") || error?.status === 429) {
+        errorMessage = "OpenAI API rate limit exceeded. Please try again later.";
+      }
+      
+      res.status(500).json({ 
+        error: errorMessage,
+        milestones: [{ 
+          title: "Error", 
+          description: errorMessage
+        }],
+        skills: [],
+        timeline: [],
+        pricing: []
+      });
     }
   });
 
